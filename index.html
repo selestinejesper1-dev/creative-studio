@@ -1,0 +1,3050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CodeQuest — Learn to Code, Cross-Language</title>
+
+<!-- Prism.js for syntax highlighting -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-rust.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+
+<!-- React -->
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<!-- In-browser JS sandbox execution needs nothing extra; Python runs via Pyodide (lazy-loaded) -->
+
+<style>
+  :root{
+    --bg: #0d1117;
+    --bg-raised: #12181f;
+    --bg-card: #151b23;
+    --border: #232b36;
+    --border-soft: #1c232d;
+    --text: #d8e0ea;
+    --text-dim: #8b98a9;
+    --text-faint: #5b6675;
+    --accent: #39d98a;
+    --accent-dim: #1f6b47;
+    --accent-glow: rgba(57, 217, 138, 0.15);
+    --amber: #e8b34a;
+    --red: #e8615c;
+    --blue: #5aa9e6;
+    --purple: #b48ce8;
+    --mono: 'JetBrains Mono', 'Fira Code', Consolas, Menlo, monospace;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --radius: 6px;
+  }
+
+  @font-face {
+    font-family: 'JetBrains Mono';
+    src: local('JetBrains Mono');
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #root { min-height: 100vh; }
+
+  ::selection { background: var(--accent-glow); color: var(--accent); }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
+
+  a { color: inherit; text-decoration: none; }
+  button { font-family: var(--sans); cursor: pointer; }
+  code, pre, textarea.code-input { font-family: var(--mono); }
+
+  /* ---------- Layout shell ---------- */
+  .app-shell { display: flex; flex-direction: column; min-height: 100vh; }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 28px;
+    background: rgba(13,17,23,0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; letter-spacing: -0.02em; }
+  .brand .bracket { color: var(--accent); font-family: var(--mono); }
+  .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+
+  .nav-links { display: flex; gap: 4px; align-items: center; }
+  .nav-links a, .nav-links button.navlink {
+    background: none; border: none; color: var(--text-dim); font-size: 14px;
+    padding: 8px 14px; border-radius: var(--radius); font-family: var(--sans);
+    transition: all .15s ease;
+  }
+  .nav-links a:hover, .nav-links button.navlink:hover { color: var(--text); background: var(--bg-card); }
+  .nav-links a.active, .nav-links button.navlink.active { color: var(--accent); background: var(--accent-glow); }
+
+  .mobile-menu-btn { display: none; background: none; border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: var(--radius); }
+
+  main.content { flex: 1; }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 28px; }
+
+  /* ---------- Homepage hero ---------- */
+  .hero {
+    padding: 90px 28px 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(600px circle at 20% 20%, rgba(57,217,138,0.06), transparent 40%),
+      radial-gradient(500px circle at 80% 30%, rgba(90,169,230,0.05), transparent 40%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: var(--mono); font-size: 13px; color: var(--accent);
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent-glow); padding: 6px 14px; border-radius: 999px;
+    margin-bottom: 22px; border: 1px solid var(--accent-dim);
+  }
+  .hero h1 {
+    font-size: clamp(36px, 6vw, 64px); font-weight: 800; letter-spacing: -0.03em;
+    margin: 0 0 18px; line-height: 1.05;
+  }
+  .hero h1 .accent-text { color: var(--accent); }
+  .hero p.sub {
+    color: var(--text-dim); font-size: 18px; max-width: 620px; margin: 0 auto 36px;
+    line-height: 1.6;
+  }
+  .hero-stats { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; margin-top: 50px; }
+  .hero-stat { font-family: var(--mono); }
+  .hero-stat .num { font-size: 28px; font-weight: 700; color: var(--text); }
+  .hero-stat .label { font-size: 12px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.08em; }
+
+  .section-heading {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 20px;
+    margin: 60px 0 24px; flex-wrap: wrap;
+  }
+  .section-heading h2 { font-size: 24px; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
+  .section-heading .section-tag { font-family: var(--mono); font-size: 12px; color: var(--text-faint); }
+
+  /* ---------- Language grid ---------- */
+  .lang-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px; padding-bottom: 60px;
+  }
+  .lang-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 22px; position: relative; overflow: hidden;
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .lang-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-soft);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+  }
+  .lang-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--lang-color, var(--accent));
+  }
+  .lang-card-top { display: flex; align-items: center; justify-content: space-between; }
+  .lang-icon {
+    width: 46px; height: 46px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-weight: 700; font-size: 18px;
+    background: color-mix(in srgb, var(--lang-color, var(--accent)) 15%, transparent);
+    color: var(--lang-color, var(--accent));
+    border: 1px solid color-mix(in srgb, var(--lang-color, var(--accent)) 30%, transparent);
+  }
+  .diff-badge {
+    font-size: 11px; font-family: var(--mono); padding: 3px 9px; border-radius: 999px;
+    text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600;
+  }
+  .diff-Beginner { background: rgba(57,217,138,0.12); color: var(--accent); }
+  .diff-Intermediate { background: rgba(232,179,74,0.12); color: var(--amber); }
+  .diff-Advanced { background: rgba(232,97,92,0.12); color: var(--red); }
+
+  .lang-card h3 { margin: 0; font-size: 19px; font-weight: 700; }
+  .lang-card p { margin: 0; color: var(--text-dim); font-size: 13.5px; line-height: 1.55; flex: 1; }
+  .lang-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+  .lang-progress-track { flex: 1; height: 5px; background: var(--border-soft); border-radius: 4px; overflow: hidden; margin-right: 12px; }
+  .lang-progress-fill { height: 100%; background: var(--lang-color, var(--accent)); border-radius: 4px; transition: width .3s ease; }
+  .lang-progress-pct { font-family: var(--mono); font-size: 12px; color: var(--text-faint); white-space: nowrap; }
+
+  /* ---------- Feature tiles on homepage ---------- */
+  .feature-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 16px; margin-bottom: 40px; }
+  .feature-tile {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 22px; cursor: pointer; transition: border-color .15s ease, transform .15s ease;
+  }
+  .feature-tile:hover { border-color: var(--accent-dim); transform: translateY(-2px); }
+  .feature-tile .ft-icon { font-size: 22px; margin-bottom: 10px; }
+  .feature-tile h4 { margin: 0 0 6px; font-size: 15.5px; }
+  .feature-tile p { margin: 0; color: var(--text-dim); font-size: 13px; line-height: 1.5; }
+
+  /* ---------- Track / module layout ---------- */
+  .track-layout { display: flex; gap: 0; align-items: flex-start; }
+  .sidebar {
+    width: 270px; flex-shrink: 0; position: sticky; top: 65px;
+    height: calc(100vh - 65px); overflow-y: auto;
+    border-right: 1px solid var(--border-soft); padding: 24px 16px;
+    background: var(--bg-raised);
+  }
+  .sidebar-header { padding: 0 10px 18px; }
+  .sidebar-header .back-link { font-size: 12.5px; color: var(--text-faint); display: inline-flex; gap: 6px; align-items: center; margin-bottom: 14px; }
+  .sidebar-header .back-link:hover { color: var(--text-dim); }
+  .sidebar-lang-title { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .sidebar-lang-title h3 { margin: 0; font-size: 17px; }
+  .sidebar-progress-label { font-family: var(--mono); font-size: 11px; color: var(--text-faint); }
+
+  .module-list { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  .module-item {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--radius);
+    font-size: 13.5px; color: var(--text-dim); border: 1px solid transparent;
+  }
+  .module-item:hover { background: var(--bg-card); color: var(--text); }
+  .module-item.active { background: var(--accent-glow); color: var(--accent); border-color: var(--accent-dim); }
+  .module-check {
+    width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px;
+  }
+  .module-check.done { background: var(--accent); border-color: var(--accent); color: #06231a; }
+  .module-num { font-family: var(--mono); font-size: 11px; color: var(--text-faint); width: 14px; }
+
+  .track-main { flex: 1; min-width: 0; padding: 36px 44px 80px; }
+  .track-main-narrow { max-width: 820px; }
+
+  .module-header { margin-bottom: 28px; }
+  .module-header .crumb { font-family: var(--mono); font-size: 12px; color: var(--text-faint); margin-bottom: 10px; }
+  .module-header h1 { font-size: 30px; margin: 0 0 12px; letter-spacing: -0.02em; }
+  .module-header .lede { color: var(--text-dim); font-size: 15.5px; line-height: 1.65; max-width: 700px; }
+
+  .prose { color: var(--text-dim); font-size: 14.5px; line-height: 1.75; }
+  .prose p { margin: 0 0 14px; }
+  .prose ul { margin: 0 0 14px; padding-left: 20px; }
+  .prose li { margin-bottom: 6px; }
+  .prose strong { color: var(--text); }
+  .prose code.inline { background: var(--bg-card); border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; font-size: 13px; color: var(--accent); }
+
+  .code-block-wrap { margin: 20px 0; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+  .code-block-header {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #1a222c; padding: 9px 16px; font-family: var(--mono); font-size: 12px; color: var(--text-faint);
+    border-bottom: 1px solid var(--border);
+  }
+  .code-block-header .dots { display: flex; gap: 6px; }
+  .code-block-header .dots span { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  .code-block-wrap pre { margin: 0 !important; border-radius: 0 !important; font-size: 13px !important; }
+  .copy-btn { background: none; border: 1px solid var(--border); color: var(--text-faint); font-size: 11px; padding: 3px 10px; border-radius: 4px; font-family: var(--mono); }
+  .copy-btn:hover { color: var(--text); border-color: var(--text-faint); }
+
+  /* ---------- Editor / playground ---------- */
+  .editor-panel { margin: 22px 0 32px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: #0a0e13; }
+  .editor-toolbar {
+    display: flex; align-items: center; justify-content: space-between; padding: 10px 14px;
+    background: #1a222c; border-bottom: 1px solid var(--border);
+  }
+  .editor-toolbar .et-label { font-family: var(--mono); font-size: 12px; color: var(--text-faint); display: flex; gap: 8px; align-items: center; }
+  .run-btn {
+    background: var(--accent); color: #06231a; border: none; font-weight: 700; font-size: 13px;
+    padding: 7px 16px; border-radius: 6px; display: flex; align-items: center; gap: 6px;
+    transition: background .15s ease;
+  }
+  .run-btn:hover { background: #4de89a; }
+  .run-btn:disabled { background: var(--border); color: var(--text-faint); cursor: not-allowed; }
+  .reset-btn {
+    background: none; color: var(--text-faint); border: 1px solid var(--border); font-size: 12px;
+    padding: 6px 12px; border-radius: 6px; margin-left: 8px;
+  }
+  .reset-btn:hover { color: var(--text); border-color: var(--text-faint); }
+
+  .editor-split { display: grid; grid-template-columns: 1fr; }
+  @media (min-width: 820px) { .editor-split { grid-template-columns: 1fr 1fr; } }
+
+  textarea.code-input {
+    width: 100%; min-height: 220px; background: #0a0e13; color: #d8e0ea; border: none; outline: none;
+    padding: 16px; font-size: 13.5px; line-height: 1.6; resize: vertical; tab-size: 4;
+    border-right: 1px solid var(--border);
+  }
+  .output-pane { padding: 16px; min-height: 220px; background: #080b0f; font-family: var(--mono); font-size: 13px; }
+  .output-pane .ph { color: var(--text-faint); font-style: italic; }
+  .output-line { white-space: pre-wrap; word-break: break-word; margin-bottom: 2px; }
+  .output-line.err { color: var(--red); }
+  .output-line.log { color: var(--text); }
+  .output-line.info { color: var(--text-faint); }
+
+  /* ---------- Quiz ---------- */
+  .quiz-box { margin: 32px 0; border: 1px solid var(--border); border-radius: 10px; padding: 26px; background: var(--bg-card); }
+  .quiz-box h3 { margin: 0 0 4px; font-size: 17px; display: flex; align-items: center; gap: 8px; }
+  .quiz-box .quiz-sub { color: var(--text-faint); font-size: 13px; margin-bottom: 20px; }
+  .quiz-q { margin-bottom: 22px; }
+  .quiz-q .qtext { font-size: 14.5px; font-weight: 600; margin-bottom: 12px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-option {
+    text-align: left; background: var(--bg-raised); border: 1px solid var(--border); color: var(--text-dim);
+    padding: 11px 14px; border-radius: 8px; font-size: 13.5px; transition: all .12s ease;
+  }
+  .quiz-option:hover:not(:disabled) { border-color: var(--text-faint); color: var(--text); }
+  .quiz-option.selected { border-color: var(--blue); background: rgba(90,169,230,0.08); }
+  .quiz-option.correct { border-color: var(--accent); background: rgba(57,217,138,0.1); color: var(--accent); }
+  .quiz-option.incorrect { border-color: var(--red); background: rgba(232,97,92,0.1); color: var(--red); }
+  .quiz-option:disabled { cursor: default; }
+  .quiz-result-banner {
+    margin-top: 18px; padding: 14px 18px; border-radius: 8px; font-size: 14px; font-weight: 600;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  }
+  .quiz-result-banner.pass { background: rgba(57,217,138,0.1); color: var(--accent); border: 1px solid var(--accent-dim); }
+  .quiz-result-banner.fail { background: rgba(232,179,74,0.1); color: var(--amber); border: 1px solid rgba(232,179,74,0.3); }
+
+  .module-nav-footer {
+    display: flex; align-items: center; justify-content: space-between; margin-top: 40px;
+    padding-top: 24px; border-top: 1px solid var(--border-soft);
+  }
+  .nav-footer-btn {
+    background: var(--bg-card); border: 1px solid var(--border); color: var(--text); padding: 12px 18px;
+    border-radius: 8px; font-size: 13.5px; display: flex; align-items: center; gap: 8px; max-width: 45%;
+  }
+  .nav-footer-btn:hover { border-color: var(--accent-dim); }
+  .nav-footer-btn .nf-label { color: var(--text-faint); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; display: block; margin-bottom: 2px; }
+  .mark-complete-btn {
+    background: var(--accent); color: #06231a; border: none; font-weight: 700; padding: 10px 20px; border-radius: 8px; font-size: 13.5px;
+  }
+  .mark-complete-btn.done { background: var(--bg-card); color: var(--accent); border: 1px solid var(--accent-dim); }
+
+  /* ---------- Compare page ---------- */
+  .compare-controls { display: flex; gap: 16px; align-items: center; margin-bottom: 30px; flex-wrap: wrap; }
+  .compare-select-wrap { display: flex; flex-direction: column; gap: 6px; }
+  .compare-select-wrap label { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-faint); font-family: var(--mono); }
+  select.lang-select {
+    background: var(--bg-card); color: var(--text); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 14px; font-size: 14px; font-family: var(--sans); min-width: 180px;
+  }
+  .compare-vs { font-family: var(--mono); color: var(--text-faint); font-size: 20px; margin-top: 18px; }
+  .task-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 24px; }
+  .task-tab { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-dim); padding: 8px 14px; border-radius: 999px; font-size: 12.5px; }
+  .task-tab.active { background: var(--accent-glow); border-color: var(--accent-dim); color: var(--accent); }
+  .compare-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+  @media (min-width: 760px) { .compare-grid { grid-template-columns: 1fr 1fr; } }
+  .compare-col { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .compare-col-head { background: #1a222c; padding: 12px 16px; font-weight: 700; font-size: 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+
+  /* ---------- Cheat sheet ---------- */
+  .cheat-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 40px; }
+  table.cheat-table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  table.cheat-table th {
+    background: #1a222c; text-align: left; padding: 12px 16px; font-family: var(--mono); font-size: 12px;
+    color: var(--text-dim); border-bottom: 1px solid var(--border); white-space: nowrap; position: sticky; top: 0;
+  }
+  table.cheat-table td { padding: 12px 16px; border-bottom: 1px solid var(--border-soft); font-family: var(--mono); font-size: 12.5px; vertical-align: top; white-space: nowrap; }
+  table.cheat-table tr:hover td { background: var(--bg-card); }
+  table.cheat-table td:first-child { font-family: var(--sans); font-weight: 600; color: var(--text); white-space: normal; min-width: 140px; }
+
+  /* ---------- Sandbox page ---------- */
+  .sandbox-lang-picker { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .sandbox-lang-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-dim); padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; }
+  .sandbox-lang-btn.active { border-color: var(--lang-color); color: var(--lang-color); background: color-mix(in srgb, var(--lang-color) 12%, transparent); }
+
+  /* ---------- Footer ---------- */
+  footer.site-footer { border-top: 1px solid var(--border-soft); padding: 30px 28px; text-align: center; color: var(--text-faint); font-size: 12.5px; }
+
+  /* ---------- misc ---------- */
+  .pill { display: inline-block; font-family: var(--mono); font-size: 11px; padding: 3px 10px; border-radius: 999px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-faint); }
+  .empty-note { color: var(--text-faint); font-size: 13.5px; padding: 40px 0; text-align: center; }
+
+  .mobile-sidebar-toggle {
+    display: none; position: fixed; bottom: 20px; right: 20px; z-index: 60;
+    background: var(--accent); color: #06231a; border: none; width: 50px; height: 50px; border-radius: 50%;
+    font-size: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+
+  @media (max-width: 860px) {
+    .nav-links { display: none; }
+    .mobile-menu-btn { display: block; }
+    .track-layout { flex-direction: column; }
+    .sidebar {
+      position: fixed; left: -300px; top: 0; height: 100vh; z-index: 55; width: 280px;
+      transition: left .25s ease; box-shadow: 4px 0 30px rgba(0,0,0,0.5);
+    }
+    .sidebar.open { left: 0; }
+    .mobile-sidebar-toggle { display: flex; align-items: center; justify-content: center; }
+    .track-main { padding: 28px 18px 60px; }
+    .container { padding: 0 16px; }
+    .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 54; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react,env">
+
+const { useState, useEffect, useMemo, useRef, useCallback } = React;
+
+/* =========================================================================
+   DATA LAYER
+   ========================================================================= */
+
+const LANGUAGES = [
+  { id: 'python', name: 'Python', color: '#4B8BBE', icon: 'Py', difficulty: 'Beginner',
+    desc: 'Readable, versatile, and the most common first language. Great for scripting, data, and web backends.' },
+  { id: 'javascript', name: 'JavaScript', color: '#e8b34a', icon: 'JS', difficulty: 'Beginner',
+    desc: 'The language of the web. Runs in every browser and, via Node.js, on servers too.' },
+  { id: 'java', name: 'Java', color: '#e8615c', icon: 'Jv', difficulty: 'Intermediate',
+    desc: 'Strongly-typed, object-oriented, and built for large-scale enterprise systems.' },
+  { id: 'cpp', name: 'C++', color: '#5aa9e6', icon: 'C++', difficulty: 'Advanced',
+    desc: 'High-performance systems language with manual memory control. Powers games, engines, and OS-level code.' },
+  { id: 'go', name: 'Go', color: '#39d98a', icon: 'Go', difficulty: 'Intermediate',
+    desc: 'Simple, fast, and built-in concurrency. A favorite for cloud infrastructure and backend services.' },
+  { id: 'rust', name: 'Rust', color: '#e07b53', icon: 'Rs', difficulty: 'Advanced',
+    desc: 'Memory-safe systems programming without a garbage collector, enforced at compile time.' },
+  { id: 'htmlcss', name: 'HTML/CSS', color: '#b48ce8', icon: '<>', difficulty: 'Beginner',
+    desc: 'The structure and style of every web page. Not a programming language, but essential to know.' },
+  { id: 'sql', name: 'SQL', color: '#5ac8a8', icon: 'DB', difficulty: 'Beginner',
+    desc: 'The language of relational databases — query, insert, update, and shape structured data.' },
+];
+
+const LANG_MAP = Object.fromEntries(LANGUAGES.map(l => [l.id, l]));
+
+// Prism language key per our language id
+const PRISM_LANG = {
+  python: 'python', javascript: 'javascript', java: 'java', cpp: 'cpp',
+  go: 'go', rust: 'rust', htmlcss: 'markup', sql: 'sql'
+};
+
+const MODULE_TEMPLATE = [
+  'Variables & Data Types',
+  'Control Flow',
+  'Functions',
+  'Data Structures',
+  'OOP Concepts',
+  'Error Handling',
+];
+
+/* ---- Per-language module content ----
+   Each module: explanation (prose html-ish via simple markdown-lite), example code,
+   starter code for editor, and a quiz (array of {q, options, correct}) */
+
+const CONTENT = {
+
+python: {
+  'Variables & Data Types': {
+    explain: `Python variables don't need a declared type — the interpreter figures it out from the value you assign. This is called **dynamic typing**.
+
+Core built-in types you'll use constantly: \`int\`, \`float\`, \`str\`, \`bool\`, \`list\`, \`dict\`, \`tuple\`, and \`set\`.
+
+- Assignment uses a single \`=\`
+- You can reassign a variable to a different type at any time
+- Use \`type(x)\` to inspect a variable's current type
+- f-strings (\`f"..."\`) are the modern way to format strings`,
+    example: `name = "Ada"
+age = 36
+height = 1.71
+is_programmer = True
+
+print(f"{name} is {age} years old")
+print(type(age))
+
+# Reassignment changes the type
+age = "thirty-six"
+print(type(age))`,
+    starter: `# Try declaring a few variables of different types
+# and printing them with an f-string
+
+city = "Nairobi"
+population = 4_397_000
+
+print(f"{city} has a population of {population:,}")
+`,
+    quiz: [
+      { q: "What does Python's dynamic typing mean?", options: [
+          "You must declare a type before using a variable",
+          "A variable's type is inferred from its value and can change",
+          "Python has no types at all",
+          "Types are checked only at compile time"
+        ], correct: 1 },
+      { q: "Which function returns a variable's current type?", options: ["typeof(x)", "type(x)", "x.type()", "kind(x)"], correct: 1 },
+      { q: "What will `print(f\"{2+2}\")` output?", options: ["2+2", "4", "'2+2'", "Error"], correct: 1 },
+    ],
+  },
+  'Control Flow': {
+    explain: `Python uses **indentation** (not braces) to define code blocks. This makes structure visually enforced.
+
+- \`if / elif / else\` for branching
+- \`for\` loops iterate over sequences (lists, strings, ranges)
+- \`while\` loops run until a condition is false
+- \`break\` exits a loop early, \`continue\` skips to the next iteration`,
+    example: `score = 82
+
+if score >= 90:
+    grade = "A"
+elif score >= 80:
+    grade = "B"
+else:
+    grade = "C"
+
+print(f"Grade: {grade}")
+
+for i in range(3):
+    if i == 1:
+        continue
+    print("Loop index:", i)`,
+    starter: `# Write a loop that prints only even numbers from 0 to 10
+
+for n in range(11):
+    pass  # replace this
+`,
+    quiz: [
+      { q: "How does Python define a block of code?", options: ["Curly braces {}", "Indentation", "BEGIN/END keywords", "Semicolons"], correct: 1 },
+      { q: "What does `continue` do inside a loop?", options: ["Stops the loop entirely", "Skips to the next iteration", "Restarts the program", "Pauses execution"], correct: 1 },
+      { q: "`range(3)` produces which sequence?", options: ["1,2,3", "0,1,2", "0,1,2,3", "3,2,1"], correct: 1 },
+    ],
+  },
+  'Functions': {
+    explain: `Functions are defined with \`def\`. Python supports default arguments, keyword arguments, and variable-length arguments (\`*args\`, \`**kwargs\`).
+
+- Return values with \`return\`
+- Functions are first-class objects — you can pass them around like any variable
+- Docstrings (triple-quoted strings right after \`def\`) document behavior`,
+    example: `def greet(name, greeting="Hello"):
+    """Return a greeting string."""
+    return f"{greeting}, {name}!"
+
+print(greet("Sam"))
+print(greet("Sam", greeting="Hey"))
+
+def total(*numbers):
+    return sum(numbers)
+
+print(total(1, 2, 3, 4))`,
+    starter: `# Write a function called square that returns x squared
+# then call it with a few different numbers
+
+def square(x):
+    pass
+
+print(square(5))
+`,
+    quiz: [
+      { q: "What keyword defines a function in Python?", options: ["func", "function", "def", "lambda"], correct: 2 },
+      { q: "What does `*args` allow a function to accept?", options: [
+          "Only keyword arguments", "A variable number of positional arguments",
+          "Exactly one argument", "No arguments"
+        ], correct: 1 },
+      { q: "How do you return a value from a function?", options: ["print(x)", "yield x", "return x", "output x"], correct: 2 },
+    ],
+  },
+  'Data Structures': {
+    explain: `Python's core built-in structures:
+
+- **list**: ordered, mutable — \`[1, 2, 3]\`
+- **tuple**: ordered, immutable — \`(1, 2, 3)\`
+- **dict**: key-value mapping — \`{"key": "value"}\`
+- **set**: unordered, unique elements — \`{1, 2, 3}\`
+
+List comprehensions offer a concise way to build lists.`,
+    example: `nums = [1, 2, 3, 4, 5]
+squares = [n * n for n in nums]
+print(squares)
+
+person = {"name": "Kwame", "age": 29}
+print(person["name"])
+person["city"] = "Accra"
+print(person)
+
+unique = set([1, 2, 2, 3, 3, 3])
+print(unique)`,
+    starter: `# Build a dictionary of 3 fruits mapped to their colors
+# then print each fruit and its color using a loop
+
+fruits = {}
+`,
+    quiz: [
+      { q: "Which structure is immutable?", options: ["list", "dict", "tuple", "set"], correct: 2 },
+      { q: "What does `[n*n for n in nums]` do?", options: [
+          "Filters nums", "Creates a list of squares", "Sorts nums", "Sums nums"
+        ], correct: 1 },
+      { q: "How do you access a dict value by key?", options: ["dict.key", "dict[key]", "dict->key", "dict(key)"], correct: 1 },
+    ],
+  },
+  'OOP Concepts': {
+    explain: `Python classes are defined with \`class\`. The constructor is \`__init__\`, and instance methods take \`self\` as the first parameter.
+
+- **Inheritance**: a class can extend another with \`class Child(Parent):\`
+- **Encapsulation**: convention-based via a leading underscore (\`_name\`)
+- Special "dunder" methods like \`__str__\` customize behavior`,
+    example: `class Animal:
+    def __init__(self, name):
+        self.name = name
+
+    def speak(self):
+        return f"{self.name} makes a sound"
+
+class Dog(Animal):
+    def speak(self):
+        return f"{self.name} barks"
+
+a = Animal("Generic")
+d = Dog("Rex")
+print(a.speak())
+print(d.speak())`,
+    starter: `# Create a class Car with a make and model,
+# and a method describe() that returns a sentence about it
+
+class Car:
+    pass
+
+c = Car()
+`,
+    quiz: [
+      { q: "What is Python's constructor method called?", options: ["__init__", "constructor", "new", "init()"], correct: 0 },
+      { q: "What must every instance method include as its first parameter?", options: ["this", "self", "obj", "instance"], correct: 1 },
+      { q: "How does a class inherit from another?", options: [
+          "class Dog extends Animal", "class Dog(Animal):", "class Dog : Animal", "class Dog inherits Animal"
+        ], correct: 1 },
+    ],
+  },
+  'Error Handling': {
+    explain: `Python uses \`try / except\` blocks to catch exceptions. You can catch specific exception types, use \`finally\` for cleanup, and raise your own exceptions with \`raise\`.`,
+    example: `def divide(a, b):
+    try:
+        return a / b
+    except ZeroDivisionError:
+        print("Cannot divide by zero")
+        return None
+    finally:
+        print("Division attempted")
+
+print(divide(10, 2))
+print(divide(10, 0))`,
+    starter: `# Write a try/except that attempts to convert "abc" to an int
+# and prints a friendly message on failure
+
+value = "abc"
+`,
+    quiz: [
+      { q: "Which block always runs, error or not?", options: ["except", "finally", "else", "catch"], correct: 1 },
+      { q: "How do you manually trigger an exception?", options: ["throw Exception", "raise Exception()", "error()", "except()"], correct: 1 },
+      { q: "What exception is raised by `1/0`?", options: ["ValueError", "TypeError", "ZeroDivisionError", "MathError"], correct: 2 },
+    ],
+  },
+},
+
+javascript: {
+  'Variables & Data Types': {
+    explain: `JavaScript has three ways to declare variables: \`var\` (legacy, function-scoped), \`let\` (block-scoped, reassignable), and \`const\` (block-scoped, cannot be reassigned).
+
+Primitive types: \`number\`, \`string\`, \`boolean\`, \`undefined\`, \`null\`, \`symbol\`, \`bigint\`. Objects and arrays are reference types.`,
+    example: `let name = "Ada";
+const age = 36;
+let isDev = true;
+
+console.log(\`\${name} is \${age} years old\`);
+console.log(typeof age);
+
+// const prevents reassignment, not mutation
+const scores = [1, 2, 3];
+scores.push(4);
+console.log(scores);`,
+    starter: `// Declare a const object with a name and city
+// then log it using a template literal
+
+const city = "Lagos";
+`,
+    quiz: [
+      { q: "Which keyword prevents reassignment?", options: ["var", "let", "const", "fixed"], correct: 2 },
+      { q: "What does `typeof \"hi\"` return?", options: ["'text'", "'str'", "'string'", "'char'"], correct: 2 },
+      { q: "Can you push to a const array?", options: ["No, arrays are frozen", "Yes, const only blocks reassignment", "Only with 'let'", "Only in strict mode"], correct: 1 },
+    ],
+  },
+  'Control Flow': {
+    explain: `JavaScript control flow looks similar to C-family languages: \`if/else\`, \`for\`, \`while\`, and \`switch\`. Braces \`{}\` define blocks.
+
+- \`for...of\` iterates values (arrays, strings)
+- \`for...in\` iterates keys (object properties)
+- Strict equality \`===\` avoids type coercion surprises from \`==\``,
+    example: `const scores = [70, 85, 92];
+
+for (const s of scores) {
+  if (s >= 90) {
+    console.log(s, "-> A");
+  } else if (s >= 80) {
+    console.log(s, "-> B");
+  } else {
+    console.log(s, "-> C");
+  }
+}
+
+let i = 0;
+while (i < 3) {
+  console.log("while:", i);
+  i++;
+}`,
+    starter: `// Loop over this array and log only values greater than 10
+
+const nums = [4, 12, 7, 20, 3];
+`,
+    quiz: [
+      { q: "Which loop iterates over array values directly?", options: ["for...in", "for...of", "for...each", "loop...of"], correct: 1 },
+      { q: "Why prefer `===` over `==`?", options: [
+          "It's faster to type", "It avoids implicit type coercion", "It's required in ES6", "There's no difference"
+        ], correct: 1 },
+      { q: "What loop type checks its condition before every iteration?", options: ["do...while", "while", "for...of", "switch"], correct: 1 },
+    ],
+  },
+  'Functions': {
+    explain: `Functions can be declared with the \`function\` keyword, as expressions, or as **arrow functions** (\`=>\`), which don't bind their own \`this\`.
+
+Default parameters and rest parameters (\`...args\`) are supported natively.`,
+    example: `function greet(name, greeting = "Hello") {
+  return \`\${greeting}, \${name}!\`;
+}
+
+const greetArrow = (name) => \`Hi, \${name}!\`;
+
+console.log(greet("Sam"));
+console.log(greetArrow("Sam"));
+
+function sumAll(...nums) {
+  return nums.reduce((a, b) => a + b, 0);
+}
+console.log(sumAll(1, 2, 3, 4));`,
+    starter: `// Write an arrow function 'square' that returns x squared
+
+const square = (x) => {
+
+};
+
+console.log(square(5));
+`,
+    quiz: [
+      { q: "What symbol defines an arrow function?", options: ["->", "=>", "::", "~>"], correct: 1 },
+      { q: "What does `...nums` collect in a function signature?", options: [
+          "A single object", "All remaining arguments into an array", "Nothing, it's invalid", "The function name"
+        ], correct: 1 },
+      { q: "Do arrow functions bind their own `this`?", options: ["Yes, always", "No, they inherit it from enclosing scope", "Only in classes", "Only with bind()"], correct: 1 },
+    ],
+  },
+  'Data Structures': {
+    explain: `JavaScript's core structures: **Array** (ordered list), **Object** (key-value pairs), **Map** (ordered key-value with any key type), and **Set** (unique values).
+
+Array methods like \`.map()\`, \`.filter()\`, and \`.reduce()\` are essential functional tools.`,
+    example: `const nums = [1, 2, 3, 4, 5];
+const squares = nums.map(n => n * n);
+console.log(squares);
+
+const person = { name: "Kwame", age: 29 };
+person.city = "Accra";
+console.log(person);
+
+const unique = new Set([1, 2, 2, 3, 3, 3]);
+console.log([...unique]);`,
+    starter: `// Use .filter() to get only even numbers from this array
+
+const nums = [1, 2, 3, 4, 5, 6, 7, 8];
+`,
+    quiz: [
+      { q: "Which method transforms every element and returns a new array?", options: [".forEach()", ".map()", ".filter()", ".reduce()"], correct: 1 },
+      { q: "What does a Set guarantee?", options: ["Sorted order", "Unique values", "Key-value pairs", "Fixed length"], correct: 1 },
+      { q: "How do you add a property to an existing object?", options: ["obj.add(key, value)", "obj[key] = value", "obj.push(key, value)", "obj.set(key, value)"], correct: 1 },
+    ],
+  },
+  'OOP Concepts': {
+    explain: `ES6 introduced \`class\` syntax as sugar over JavaScript's prototype-based inheritance. Classes have a \`constructor\`, methods, and support \`extends\` for inheritance.`,
+    example: `class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+  speak() {
+    return \`\${this.name} makes a sound\`;
+  }
+}
+
+class Dog extends Animal {
+  speak() {
+    return \`\${this.name} barks\`;
+  }
+}
+
+const a = new Animal("Generic");
+const d = new Dog("Rex");
+console.log(a.speak());
+console.log(d.speak());`,
+    starter: `// Create a class Car with make/model properties
+// and a describe() method
+
+class Car {
+
+}
+
+const c = new Car();
+`,
+    quiz: [
+      { q: "What keyword creates a subclass in JS?", options: ["inherits", "extends", "implements", "derives"], correct: 1 },
+      { q: "What is JavaScript's underlying inheritance model?", options: ["Class-based only", "Prototype-based", "Interface-based", "Trait-based"], correct: 1 },
+      { q: "What refers to the current instance inside a method?", options: ["self", "this", "me", "current"], correct: 1 },
+    ],
+  },
+  'Error Handling': {
+    explain: `JavaScript uses \`try / catch / finally\`. You can throw any value with \`throw\`, though throwing an \`Error\` object is best practice since it carries a stack trace.`,
+    example: `function divide(a, b) {
+  try {
+    if (b === 0) throw new Error("Cannot divide by zero");
+    return a / b;
+  } catch (err) {
+    console.log("Caught:", err.message);
+    return null;
+  } finally {
+    console.log("Division attempted");
+  }
+}
+
+console.log(divide(10, 2));
+console.log(divide(10, 0));`,
+    starter: `// Try parsing "abc" with parseInt and handle the NaN case
+
+const value = "abc";
+`,
+    quiz: [
+      { q: "What block runs regardless of an error?", options: ["catch", "finally", "else", "always"], correct: 1 },
+      { q: "What's the recommended way to throw an error?", options: ["throw 'message'", "throw new Error('message')", "raise Error('message')", "return Error"], correct: 1 },
+      { q: "How do you access the error message inside catch?", options: ["err", "err.message", "error.text", "catch.msg"], correct: 1 },
+    ],
+  },
+},
+
+java: {
+  'Variables & Data Types': {
+    explain: `Java is **statically typed** — every variable's type is declared explicitly and checked at compile time.
+
+Primitive types: \`int\`, \`double\`, \`boolean\`, \`char\`, \`long\`. Everything else (like \`String\`) is a reference type (an object).`,
+    example: `public class Main {
+    public static void main(String[] args) {
+        String name = "Ada";
+        int age = 36;
+        double height = 1.71;
+        boolean isDev = true;
+
+        System.out.println(name + " is " + age + " years old");
+    }
+}`,
+    starter: `public class Main {
+    public static void main(String[] args) {
+        // Declare an int population and a String city
+        // then print them together
+
+    }
+}`,
+    quiz: [
+      { q: "Is Java statically or dynamically typed?", options: ["Dynamically typed", "Statically typed", "Untyped", "Depends on the JVM"], correct: 1 },
+      { q: "Which is a Java primitive type?", options: ["String", "int", "Array", "Object"], correct: 1 },
+      { q: "What must every Java variable declaration include?", options: ["A default value", "An explicit type", "A comment", "The 'var' keyword"], correct: 1 },
+    ],
+  },
+  'Control Flow': {
+    explain: `Java's control flow uses \`if/else\`, \`for\`, \`while\`, and \`switch\`, with braces defining blocks — familiar to anyone coming from C-like languages.
+
+Java 14+ also supports enhanced switch expressions.`,
+    example: `public class Main {
+    public static void main(String[] args) {
+        int score = 82;
+        String grade;
+
+        if (score >= 90) {
+            grade = "A";
+        } else if (score >= 80) {
+            grade = "B";
+        } else {
+            grade = "C";
+        }
+        System.out.println("Grade: " + grade);
+
+        for (int i = 0; i < 3; i++) {
+            System.out.println("Loop index: " + i);
+        }
+    }
+}`,
+    starter: `public class Main {
+    public static void main(String[] args) {
+        // Loop from 0 to 10 and print only even numbers
+
+    }
+}`,
+    quiz: [
+      { q: "What defines a code block in Java?", options: ["Indentation", "Curly braces {}", "Colons", "Keywords only"], correct: 1 },
+      { q: "Which loop structure is best when iteration count is known?", options: ["while", "for", "do", "if"], correct: 1 },
+      { q: "What does `i++` do?", options: ["Decrements i", "Increments i by 1", "Doubles i", "Resets i to 0"], correct: 1 },
+    ],
+  },
+  'Functions': {
+    explain: `In Java, functions are called **methods** and must live inside a class. Every method declares a return type (or \`void\`), parameter types, and an access modifier.`,
+    example: `public class Main {
+    static String greet(String name) {
+        return "Hello, " + name + "!";
+    }
+
+    static int sumAll(int... numbers) {
+        int total = 0;
+        for (int n : numbers) total += n;
+        return total;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(greet("Sam"));
+        System.out.println(sumAll(1, 2, 3, 4));
+    }
+}`,
+    starter: `public class Main {
+    static int square(int x) {
+        // return x squared
+        return 0;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(square(5));
+    }
+}`,
+    quiz: [
+      { q: "What must every Java method declare?", options: ["A return type", "A docstring", "A default value", "Nothing extra"], correct: 0 },
+      { q: "What keyword means 'no return value'?", options: ["null", "void", "none", "empty"], correct: 1 },
+      { q: "What does `int... numbers` represent?", options: ["An array of ints only", "A varargs parameter (variable number of ints)", "A single int", "A typo"], correct: 1 },
+    ],
+  },
+  'Data Structures': {
+    explain: `Java's Collections Framework provides \`ArrayList\`, \`HashMap\`, \`HashSet\`, and \`LinkedList\` — all generically typed (\`ArrayList<String>\`).
+
+Arrays are fixed-size and typed; collections are resizable.`,
+    example: `import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> nums = new ArrayList<>(List.of(1, 2, 3, 4, 5));
+
+        Map<String, String> person = new HashMap<>();
+        person.put("name", "Kwame");
+        person.put("city", "Accra");
+
+        System.out.println(nums);
+        System.out.println(person.get("name"));
+    }
+}`,
+    starter: `import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // Create a HashMap of 3 fruits to colors and print each entry
+
+    }
+}`,
+    quiz: [
+      { q: "Which is a resizable list implementation?", options: ["int[]", "ArrayList", "Array", "Struct"], correct: 1 },
+      { q: "Which collection stores key-value pairs?", options: ["ArrayList", "HashSet", "HashMap", "LinkedList"], correct: 2 },
+      { q: "How do you declare a List of Strings generically?", options: ["List<String>", "List[String]", "List(String)", "StringList"], correct: 0 },
+    ],
+  },
+  'OOP Concepts': {
+    explain: `Java is fundamentally object-oriented. Classes support **inheritance** (\`extends\`), **interfaces** (\`implements\`), and access modifiers (\`public\`, \`private\`, \`protected\`) for encapsulation.`,
+    example: `class Animal {
+    protected String name;
+    Animal(String name) { this.name = name; }
+    String speak() { return name + " makes a sound"; }
+}
+
+class Dog extends Animal {
+    Dog(String name) { super(name); }
+    @Override
+    String speak() { return name + " barks"; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Animal a = new Animal("Generic");
+        Dog d = new Dog("Rex");
+        System.out.println(a.speak());
+        System.out.println(d.speak());
+    }
+}`,
+    starter: `class Car {
+    // Add make and model fields, a constructor, and describe()
+}
+
+public class Main {
+    public static void main(String[] args) {
+
+    }
+}`,
+    quiz: [
+      { q: "What keyword allows a class to inherit from another?", options: ["implements", "extends", "inherits", "with"], correct: 1 },
+      { q: "What does `@Override` indicate?", options: [
+          "The method is deprecated", "This method overrides a parent method", "The method is static", "The method is private"
+        ], correct: 1 },
+      { q: "How does a subclass call its parent's constructor?", options: ["parent()", "super()", "base()", "this.parent()"], correct: 1 },
+    ],
+  },
+  'Error Handling': {
+    explain: `Java uses **checked** and **unchecked** exceptions with \`try/catch/finally\`. Checked exceptions must be declared with \`throws\` or caught explicitly.`,
+    example: `public class Main {
+    static double divide(double a, double b) {
+        try {
+            if (b == 0) throw new ArithmeticException("Cannot divide by zero");
+            return a / b;
+        } finally {
+            System.out.println("Division attempted");
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            System.out.println(divide(10, 0));
+        } catch (ArithmeticException e) {
+            System.out.println("Caught: " + e.getMessage());
+        }
+    }
+}`,
+    starter: `public class Main {
+    public static void main(String[] args) {
+        // Try Integer.parseInt("abc") and catch NumberFormatException
+
+    }
+}`,
+    quiz: [
+      { q: "What block always executes in Java exception handling?", options: ["catch", "finally", "else", "throws"], correct: 1 },
+      { q: "What's the difference between checked and unchecked exceptions?", options: [
+          "No difference", "Checked exceptions must be declared or caught at compile time", "Unchecked exceptions are faster", "Checked exceptions only work in main()"
+        ], correct: 1 },
+      { q: "What exception is thrown by invalid number parsing?", options: ["ParseException", "NumberFormatException", "TypeError", "ValueException"], correct: 1 },
+    ],
+  },
+},
+
+cpp: {
+  'Variables & Data Types': {
+    explain: `C++ is statically typed like C, with explicit types: \`int\`, \`double\`, \`char\`, \`bool\`, and \`std::string\` for text. Modern C++ (11+) introduced \`auto\` for type inference.`,
+    example: `#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string name = "Ada";
+    int age = 36;
+    double height = 1.71;
+    bool isDev = true;
+
+    cout << name << " is " << age << " years old" << endl;
+
+    auto x = 42; // auto infers int
+    return 0;
+}`,
+    starter: `#include <iostream>
+using namespace std;
+
+int main() {
+    // Declare an int population and a string city, then print them
+
+    return 0;
+}`,
+    quiz: [
+      { q: "What does `auto` do in modern C++?", options: ["Makes a variable global", "Infers the type from the initializer", "Declares a constant", "Nothing, it's deprecated"], correct: 1 },
+      { q: "Which type represents text in idiomatic C++?", options: ["char*", "std::string", "text", "String"], correct: 1 },
+      { q: "What header is needed for console output?", options: ["<stdio.h>", "<iostream>", "<string>", "<output>"], correct: 1 },
+    ],
+  },
+  'Control Flow': {
+    explain: `C++ control flow (\`if\`, \`for\`, \`while\`, \`switch\`) mirrors C, with braces for blocks. Range-based \`for\` loops (C++11+) simplify iteration over containers.`,
+    example: `#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    vector<int> scores = {70, 85, 92};
+
+    for (int s : scores) {
+        if (s >= 90) cout << s << " -> A" << endl;
+        else if (s >= 80) cout << s << " -> B" << endl;
+        else cout << s << " -> C" << endl;
+    }
+    return 0;
+}`,
+    starter: `#include <iostream>
+using namespace std;
+
+int main() {
+    // Loop from 0 to 10, print only even numbers
+
+    return 0;
+}`,
+    quiz: [
+      { q: "What does a range-based for loop iterate over?", options: ["Only arrays", "Elements of a container directly", "Only integers", "Pointers only"], correct: 1 },
+      { q: "What ends a statement in C++?", options: ["A newline", "A semicolon", "A colon", "Nothing required"], correct: 1 },
+      { q: "Which container is used above to hold scores?", options: ["array", "vector", "list", "set"], correct: 1 },
+    ],
+  },
+  'Functions': {
+    explain: `C++ functions declare a return type and parameter types. You can overload functions (same name, different parameters) and pass parameters by value, pointer, or reference (\`&\`).`,
+    example: `#include <iostream>
+using namespace std;
+
+string greet(string name, string greeting = "Hello") {
+    return greeting + ", " + name + "!";
+}
+
+void increment(int &x) {
+    x += 1; // modifies the caller's variable via reference
+}
+
+int main() {
+    cout << greet("Sam") << endl;
+    int n = 5;
+    increment(n);
+    cout << n << endl;
+    return 0;
+}`,
+    starter: `#include <iostream>
+using namespace std;
+
+int square(int x) {
+    // return x squared
+    return 0;
+}
+
+int main() {
+    cout << square(5) << endl;
+    return 0;
+}`,
+    quiz: [
+      { q: "What does passing by reference (`&`) allow?", options: [
+          "Making a copy of the argument", "Modifying the caller's original variable", "Preventing modification", "Nothing special"
+        ], correct: 1 },
+      { q: "What is function overloading?", options: [
+          "Calling a function too many times", "Defining multiple functions with the same name but different parameters", "A runtime error", "Recursive functions"
+        ], correct: 1 },
+      { q: "What must every C++ function declare?", options: ["A default parameter", "A return type", "A template", "Nothing"], correct: 1 },
+    ],
+  },
+  'Data Structures': {
+    explain: `The C++ Standard Template Library (STL) provides \`vector\` (dynamic array), \`map\` (ordered key-value), \`unordered_map\` (hash map), and \`set\`.`,
+    example: `#include <iostream>
+#include <vector>
+#include <map>
+using namespace std;
+
+int main() {
+    vector<int> nums = {1, 2, 3, 4, 5};
+
+    map<string, string> person;
+    person["name"] = "Kwame";
+    person["city"] = "Accra";
+
+    cout << person["name"] << endl;
+    for (int n : nums) cout << n * n << " ";
+    cout << endl;
+    return 0;
+}`,
+    starter: `#include <iostream>
+#include <map>
+using namespace std;
+
+int main() {
+    // Create a map<string,string> of 3 fruits to colors, print each
+
+    return 0;
+}`,
+    quiz: [
+      { q: "Which STL container is a dynamic, resizable array?", options: ["array", "vector", "list", "set"], correct: 1 },
+      { q: "Which container stores sorted key-value pairs?", options: ["vector", "map", "queue", "stack"], correct: 1 },
+      { q: "What library provides these containers?", options: ["Boost", "STL", "POSIX", "Qt"], correct: 1 },
+    ],
+  },
+  'OOP Concepts': {
+    explain: `C++ classes support inheritance, access specifiers (\`public\`, \`private\`, \`protected\`), and **virtual functions** for polymorphism — a base class pointer can call the derived class's overridden method.`,
+    example: `#include <iostream>
+using namespace std;
+
+class Animal {
+public:
+    string name;
+    Animal(string n) : name(n) {}
+    virtual string speak() { return name + " makes a sound"; }
+};
+
+class Dog : public Animal {
+public:
+    Dog(string n) : Animal(n) {}
+    string speak() override { return name + " barks"; }
+};
+
+int main() {
+    Animal* a = new Dog("Rex");
+    cout << a->speak() << endl; // polymorphism: calls Dog::speak
+    return 0;
+}`,
+    starter: `#include <iostream>
+using namespace std;
+
+class Car {
+public:
+    // Add make, model fields, a constructor, and describe()
+};
+
+int main() {
+
+    return 0;
+}`,
+    quiz: [
+      { q: "What keyword enables polymorphism on a method?", options: ["static", "virtual", "const", "inline"], correct: 1 },
+      { q: "What does `: public Animal` mean in a class declaration?", options: [
+          "Composition", "Public inheritance from Animal", "A typo", "Interface implementation"
+        ], correct: 1 },
+      { q: "What does `override` communicate to the compiler?", options: [
+          "Nothing, it's just a comment", "This method intentionally overrides a virtual base method", "The method is private", "The method cannot be called"
+        ], correct: 1 },
+    ],
+  },
+  'Error Handling': {
+    explain: `C++ uses \`try / catch / throw\` for exceptions, typically throwing objects derived from \`std::exception\`. Unlike Java, exception use is less pervasive — many C++ codebases prefer error codes for performance-critical paths.`,
+    example: `#include <iostream>
+#include <stdexcept>
+using namespace std;
+
+double divide(double a, double b) {
+    if (b == 0) throw runtime_error("Cannot divide by zero");
+    return a / b;
+}
+
+int main() {
+    try {
+        cout << divide(10, 0) << endl;
+    } catch (const runtime_error &e) {
+        cout << "Caught: " << e.what() << endl;
+    }
+    return 0;
+}`,
+    starter: `#include <iostream>
+using namespace std;
+
+int main() {
+    // Throw and catch a runtime_error for an invalid input
+
+    return 0;
+}`,
+    quiz: [
+      { q: "What standard header provides `runtime_error`?", options: ["<error>", "<stdexcept>", "<exception.h>", "<iostream>"], correct: 1 },
+      { q: "How do you access an exception's message?", options: ["e.message()", "e.what()", "e.msg", "e.toString()"], correct: 1 },
+      { q: "What keyword raises an exception?", options: ["raise", "throw", "error", "signal"], correct: 1 },
+    ],
+  },
+},
+
+go: {
+  'Variables & Data Types': {
+    explain: `Go is statically typed but supports type inference with \`:=\`. Core types: \`int\`, \`float64\`, \`string\`, \`bool\`. Every declared variable must be used, or the compiler errors.`,
+    example: `package main
+
+import "fmt"
+
+func main() {
+    var name string = "Ada"
+    age := 36 // type inferred as int
+    height := 1.71
+    isDev := true
+
+    fmt.Println(name, "is", age, "years old")
+}`,
+    starter: `package main
+
+import "fmt"
+
+func main() {
+    // Declare population (int) and city (string), then print them
+
+}`,
+    quiz: [
+      { q: "What operator declares and infers a variable's type at once?", options: ["=", ":=", "var:", "->"], correct: 1 },
+      { q: "What happens if you declare a variable but never use it?", options: ["Nothing", "A compile error", "A warning only", "It's optimized away silently"], correct: 1 },
+      { q: "Which package handles console output?", options: ["\"io\"", "\"fmt\"", "\"os\"", "\"print\""], correct: 1 },
+    ],
+  },
+  'Control Flow': {
+    explain: `Go simplifies control flow: there's only \`for\` (no separate \`while\`), and \`if\` statements need no parentheses around the condition. Go also has no ternary operator.`,
+    example: `package main
+
+import "fmt"
+
+func main() {
+    score := 82
+    var grade string
+
+    if score >= 90 {
+        grade = "A"
+    } else if score >= 80 {
+        grade = "B"
+    } else {
+        grade = "C"
+    }
+    fmt.Println("Grade:", grade)
+
+    for i := 0; i < 3; i++ {
+        fmt.Println("Loop index:", i)
+    }
+}`,
+    starter: `package main
+
+import "fmt"
+
+func main() {
+    // Loop from 0 to 10, print only even numbers
+
+}`,
+    quiz: [
+      { q: "How many looping keywords does Go have?", options: ["1 (for)", "2 (for, while)", "3 (for, while, do)", "4"], correct: 0 },
+      { q: "Do Go if-conditions require parentheses?", options: ["Yes, always", "No", "Only for complex conditions", "Only in loops"], correct: 1 },
+      { q: "Does Go have a ternary operator (`? :`)?", options: ["Yes", "No", "Only in Go 1.20+", "Only for booleans"], correct: 1 },
+    ],
+  },
+  'Functions': {
+    explain: `Go functions can return multiple values — heavily used for the "value, error" pattern. Parameters and return types are explicit.`,
+    example: `package main
+
+import "fmt"
+
+func greet(name string) string {
+    return "Hello, " + name + "!"
+}
+
+func divide(a, b float64) (float64, error) {
+    if b == 0 {
+        return 0, fmt.Errorf("cannot divide by zero")
+    }
+    return a / b, nil
+}
+
+func main() {
+    fmt.Println(greet("Sam"))
+    result, err := divide(10, 0)
+    if err != nil {
+        fmt.Println("Error:", err)
+    } else {
+        fmt.Println(result)
+    }
+}`,
+    starter: `package main
+
+import "fmt"
+
+func square(x int) int {
+    // return x squared
+    return 0
+}
+
+func main() {
+    fmt.Println(square(5))
+}`,
+    quiz: [
+      { q: "What's idiomatic in Go for handling failure?", options: [
+          "try/catch blocks", "Returning a value and an error together", "Global error flags", "Panicking on every error"
+        ], correct: 1 },
+      { q: "Can Go functions return multiple values?", options: ["No, only one", "Yes, natively", "Only via structs", "Only via pointers"], correct: 1 },
+      { q: "What does `err != nil` check?", options: ["If err is zero", "If an error occurred", "If err is a string", "If the function ran"], correct: 1 },
+    ],
+  },
+  'Data Structures': {
+    explain: `Go's core structures: **slices** (dynamic arrays, more common than fixed arrays), **maps** (key-value), and **structs** (custom data types grouping fields).`,
+    example: `package main
+
+import "fmt"
+
+type Person struct {
+    Name string
+    City string
+}
+
+func main() {
+    nums := []int{1, 2, 3, 4, 5}
+
+    person := Person{Name: "Kwame", City: "Accra"}
+    fmt.Println(person.Name)
+
+    ages := map[string]int{"Kwame": 29, "Ada": 36}
+    fmt.Println(ages["Ada"])
+    fmt.Println(nums)
+}`,
+    starter: `package main
+
+import "fmt"
+
+func main() {
+    // Create a map[string]string of 3 fruits to colors, print each
+
+}`,
+    quiz: [
+      { q: "What's Go's dynamic array type called?", options: ["array", "slice", "list", "vector"], correct: 1 },
+      { q: "How do you group related fields into a custom type?", options: ["class", "struct", "record", "object"], correct: 1 },
+      { q: "What's the syntax for a map literal?", options: ["map(string, int){}", "map[string]int{}", "{string: int}", "dict[string]int"], correct: 1 },
+    ],
+  },
+  'OOP Concepts': {
+    explain: `Go has no classes or inheritance. Instead, it uses **structs with methods** and **interfaces** for polymorphism — a form of composition over inheritance.`,
+    example: `package main
+
+import "fmt"
+
+type Animal struct {
+    Name string
+}
+
+func (a Animal) Speak() string {
+    return a.Name + " makes a sound"
+}
+
+type Speaker interface {
+    Speak() string
+}
+
+func main() {
+    a := Animal{Name: "Rex"}
+    var s Speaker = a
+    fmt.Println(s.Speak())
+}`,
+    starter: `package main
+
+import "fmt"
+
+type Car struct {
+    // Add Make and Model fields
+}
+
+func (c Car) Describe() string {
+    // return a description
+    return ""
+}
+
+func main() {
+
+}`,
+    quiz: [
+      { q: "Does Go support classical inheritance?", options: ["Yes, with extends", "No, it uses composition and interfaces", "Only with generics", "Yes, with implements"], correct: 1 },
+      { q: "How do you attach a method to a struct?", options: [
+          "Inside the struct body", "func (receiver Type) MethodName()", "Using 'this'", "Methods can't attach to structs"
+        ], correct: 1 },
+      { q: "What achieves polymorphism in Go?", options: ["Abstract classes", "Interfaces", "Templates", "Macros"], correct: 1 },
+    ],
+  },
+  'Error Handling': {
+    explain: `Go doesn't use exceptions for regular error handling — errors are just values, returned alongside results and checked explicitly. \`panic\`/\`recover\` exist but are reserved for truly exceptional situations.`,
+    example: `package main
+
+import (
+    "errors"
+    "fmt"
+)
+
+func divide(a, b float64) (float64, error) {
+    if b == 0 {
+        return 0, errors.New("cannot divide by zero")
+    }
+    return a / b, nil
+}
+
+func main() {
+    result, err := divide(10, 0)
+    if err != nil {
+        fmt.Println("Error:", err)
+        return
+    }
+    fmt.Println(result)
+}`,
+    starter: `package main
+
+import (
+    "errors"
+    "fmt"
+)
+
+func safeSqrt(x float64) (float64, error) {
+    // return an error if x is negative
+
+    return 0, nil
+}
+
+func main() {
+
+}`,
+    quiz: [
+      { q: "How does idiomatic Go signal an error?", options: [
+          "Throwing an exception", "Returning an error value alongside the result", "Setting a global flag", "Always panicking"
+        ], correct: 1 },
+      { q: "When should `panic` typically be used?", options: [
+          "For all errors", "For truly unrecoverable situations", "For validation errors", "Never"
+        ], correct: 1 },
+      { q: "What package provides `errors.New`?", options: ["\"fmt\"", "\"errors\"", "\"os\"", "\"panic\""], correct: 1 },
+    ],
+  },
+},
+
+rust: {
+  'Variables & Data Types': {
+    explain: `Rust variables are **immutable by default** — you must add \`mut\` to allow reassignment. This is a core part of Rust's safety guarantees.
+
+Core types: \`i32\`, \`f64\`, \`bool\`, \`char\`, \`String\`/\`&str\`.`,
+    example: `fn main() {
+    let name = "Ada";
+    let age: i32 = 36;
+    let mut counter = 0;
+
+    counter += 1; // fine, counter is mutable
+
+    println!("{} is {} years old", name, age);
+    println!("counter = {}", counter);
+}`,
+    starter: `fn main() {
+    // Declare an immutable city (&str) and a mutable population (i32)
+    // then print them
+
+}`,
+    quiz: [
+      { q: "Are Rust variables mutable by default?", options: ["Yes", "No — you must add 'mut'", "Only inside functions", "Only primitives are mutable"], correct: 1 },
+      { q: "What keyword allows reassignment?", options: ["var", "mut", "let!", "change"], correct: 1 },
+      { q: "What macro prints to the console?", options: ["print!()", "println!()", "console.log()", "echo!()"], correct: 1 },
+    ],
+  },
+  'Control Flow': {
+    explain: `Rust's \`if\`, \`for\`, \`while\`, and \`loop\` work similarly to other C-family languages, but \`if\` is an **expression** — it can return a value directly.`,
+    example: `fn main() {
+    let score = 82;
+
+    let grade = if score >= 90 {
+        "A"
+    } else if score >= 80 {
+        "B"
+    } else {
+        "C"
+    };
+    println!("Grade: {}", grade);
+
+    for i in 0..3 {
+        println!("Loop index: {}", i);
+    }
+}`,
+    starter: `fn main() {
+    // Loop from 0 to 10 and print only even numbers
+
+}`,
+    quiz: [
+      { q: "Can `if` be used as an expression in Rust?", options: ["No", "Yes, it can return a value", "Only with match", "Only in loops"], correct: 1 },
+      { q: "What does `0..3` represent?", options: ["A tuple", "A range from 0 up to (not including) 3", "An array", "A float"], correct: 1 },
+      { q: "Which loop runs forever until explicitly broken?", options: ["for", "while", "loop", "repeat"], correct: 2 },
+    ],
+  },
+  'Functions': {
+    explain: `Rust functions use \`fn\`, with explicit parameter and return types. The last expression in a function (without a semicolon) is implicitly returned.`,
+    example: `fn greet(name: &str) -> String {
+    format!("Hello, {}!", name)
+}
+
+fn square(x: i32) -> i32 {
+    x * x // no semicolon = implicit return
+}
+
+fn main() {
+    println!("{}", greet("Sam"));
+    println!("{}", square(5));
+}`,
+    starter: `fn square(x: i32) -> i32 {
+    // return x squared without using 'return'
+
+    0
+}
+
+fn main() {
+    println!("{}", square(5));
+}`,
+    quiz: [
+      { q: "How can a Rust function return a value without `return`?", options: [
+          "It can't", "As the last expression, without a trailing semicolon", "Using yield", "With #[return]"
+        ], correct: 1 },
+      { q: "What must every Rust function parameter declare?", options: ["A default value", "An explicit type", "A lifetime always", "Nothing"], correct: 1 },
+      { q: "What does `-> i32` denote in a function signature?", options: ["A parameter", "The return type", "A generic", "An error type"], correct: 1 },
+    ],
+  },
+  'Data Structures': {
+    explain: `Rust's core structures: \`Vec<T>\` (growable array), \`HashMap<K,V>\`, and \`struct\` for custom types. Rust's **ownership** system tracks who is responsible for freeing memory — no garbage collector needed.`,
+    example: `use std::collections::HashMap;
+
+struct Person {
+    name: String,
+    city: String,
+}
+
+fn main() {
+    let nums = vec![1, 2, 3, 4, 5];
+
+    let mut ages: HashMap<&str, i32> = HashMap::new();
+    ages.insert("Kwame", 29);
+
+    let person = Person { name: String::from("Kwame"), city: String::from("Accra") };
+
+    println!("{:?}", nums);
+    println!("{}", person.name);
+}`,
+    starter: `use std::collections::HashMap;
+
+fn main() {
+    // Create a HashMap of 3 fruits to colors, print each
+
+}`,
+    quiz: [
+      { q: "What is Rust's growable array type?", options: ["Array<T>", "Vec<T>", "List<T>", "Slice<T>"], correct: 1 },
+      { q: "How does Rust manage memory without a garbage collector?", options: [
+          "Manual free() calls", "An ownership and borrowing system checked at compile time", "Reference counting only", "It leaks intentionally"
+        ], correct: 1 },
+      { q: "What macro prints a struct for debugging?", options: ["println!(\"{}\")", "println!(\"{:?}\")", "debug!()", "inspect!()"], correct: 1 },
+    ],
+  },
+  'OOP Concepts': {
+    explain: `Rust has no classes or inheritance. Instead, it uses \`struct\` for data and \`impl\` blocks for methods, with \`trait\`s providing shared behavior — similar in spirit to Go's interfaces.`,
+    example: `trait Speak {
+    fn speak(&self) -> String;
+}
+
+struct Animal { name: String }
+
+impl Speak for Animal {
+    fn speak(&self) -> String {
+        format!("{} makes a sound", self.name)
+    }
+}
+
+fn main() {
+    let a = Animal { name: String::from("Rex") };
+    println!("{}", a.speak());
+}`,
+    starter: `struct Car {
+    // Add make and model fields
+}
+
+impl Car {
+    fn describe(&self) -> String {
+        // return a description
+        String::from("")
+    }
+}
+
+fn main() {
+
+}`,
+    quiz: [
+      { q: "What replaces classes in Rust?", options: ["Structs with impl blocks", "Modules", "Enums only", "Traits alone"], correct: 0 },
+      { q: "What provides shared behavior across types in Rust?", options: ["Inheritance", "Traits", "Abstract classes", "Interfaces (Java-style)"], correct: 1 },
+      { q: "What does `&self` represent in a method?", options: [
+          "A static reference", "A borrowed reference to the instance calling the method", "A global variable", "A new instance"
+        ], correct: 1 },
+    ],
+  },
+  'Error Handling': {
+    explain: `Rust avoids exceptions entirely. Recoverable errors use the \`Result<T, E>\` enum; the \`?\` operator propagates errors concisely. Irrecoverable errors use \`panic!\`.`,
+    example: `fn divide(a: f64, b: f64) -> Result<f64, String> {
+    if b == 0.0 {
+        return Err(String::from("Cannot divide by zero"));
+    }
+    Ok(a / b)
+}
+
+fn main() {
+    match divide(10.0, 0.0) {
+        Ok(result) => println!("Result: {}", result),
+        Err(e) => println!("Error: {}", e),
+    }
+}`,
+    starter: `fn safe_sqrt(x: f64) -> Result<f64, String> {
+    // return Err if x is negative, else Ok(x.sqrt())
+
+    Ok(0.0)
+}
+
+fn main() {
+
+}`,
+    quiz: [
+      { q: "What type represents recoverable errors in Rust?", options: ["Option<T>", "Result<T, E>", "Error<T>", "Maybe<T>"], correct: 1 },
+      { q: "What does the `?` operator do?", options: [
+          "Comments out a line", "Propagates an error early if the Result is Err", "Declares an optional type", "Nothing, it's syntax sugar for printing"
+        ], correct: 1 },
+      { q: "What macro triggers an unrecoverable crash?", options: ["panic!()", "crash!()", "error!()", "abort!()"], correct: 0 },
+    ],
+  },
+},
+
+htmlcss: {
+  'Variables & Data Types': {
+    explain: `HTML doesn't have "variables" in the programming sense, but CSS has **custom properties** (CSS variables), declared with \`--name\` and used via \`var(--name)\`. HTML itself is built from typed elements: text, headings, links, images, etc.`,
+    example: `<!-- HTML structure -->
+<div class="card">
+  <h2>Title</h2>
+  <p>Some text</p>
+</div>
+
+<style>
+:root {
+  --primary-color: #39d98a;
+  --spacing: 16px;
+}
+
+.card {
+  color: var(--primary-color);
+  padding: var(--spacing);
+}
+</style>`,
+    starter: `<div class="box">Hello</div>
+
+<style>
+:root {
+  --box-color: tomato;
+}
+.box {
+  /* use var(--box-color) to set the background */
+}
+</style>`,
+    quiz: [
+      { q: "How do you declare a CSS custom property?", options: ["$name: value;", "--name: value;", "@name: value;", "let name = value;"], correct: 1 },
+      { q: "How do you use a CSS variable?", options: ["use(--name)", "var(--name)", "get(--name)", "$--name"], correct: 1 },
+      { q: "Where are CSS variables conventionally declared for global use?", options: [".global", ":root", "body", "@vars"], correct: 1 },
+    ],
+  },
+  'Control Flow': {
+    explain: `CSS has no traditional control flow, but achieves conditional styling via **selectors**, **media queries** (responsive conditions), and pseudo-classes like \`:hover\` and \`:nth-child()\`.`,
+    example: `<style>
+.item:nth-child(odd) {
+  background: #151b23;
+}
+
+.item:hover {
+  color: #39d98a;
+}
+
+@media (max-width: 600px) {
+  .item {
+    font-size: 14px;
+  }
+}
+</style>
+
+<div class="item">Row 1</div>
+<div class="item">Row 2</div>`,
+    starter: `<style>
+/* Make every 3rd item bold using :nth-child */
+.item {
+
+}
+</style>
+<div class="item">A</div>
+<div class="item">B</div>
+<div class="item">C</div>`,
+    quiz: [
+      { q: "What lets CSS apply styles conditionally based on screen size?", options: ["@screen", "@media", "@responsive", "@if"], correct: 1 },
+      { q: "Which pseudo-class targets an element on mouse hover?", options: [":active", ":hover", ":focus", ":visited"], correct: 1 },
+      { q: "What selects every other row?", options: [":nth-child(odd)", ":every(2)", ":alt", ":odd-row"], correct: 0 },
+    ],
+  },
+  'Functions': {
+    explain: `CSS has function-like utilities: \`calc()\` for math, \`rgba()\`/\`hsl()\` for color, \`var()\` for custom properties, and \`clamp()\` for responsive sizing.`,
+    example: `<style>
+.box {
+  width: calc(100% - 40px);
+  font-size: clamp(14px, 2vw, 20px);
+  background: rgba(57, 217, 138, 0.15);
+}
+</style>
+<div class="box">Resizable box</div>`,
+    starter: `<style>
+.box {
+  /* Set width to calc(50% - 10px) */
+}
+</style>
+<div class="box">Box</div>`,
+    quiz: [
+      { q: "What does `calc()` allow?", options: ["Running JavaScript", "Mixing units in a mathematical expression", "Declaring variables", "Media queries"], correct: 1 },
+      { q: "What does `clamp(14px, 2vw, 20px)` do?", options: [
+          "Sets a fixed size of 14px", "Scales with viewport width but stays between 14px and 20px", "Ignores the middle value", "Only works on width"
+        ], correct: 1 },
+      { q: "What does `rgba()` add over `rgb()`?", options: ["Radius", "An alpha (opacity) channel", "Rotation", "Nothing"], correct: 1 },
+    ],
+  },
+  'Data Structures': {
+    explain: `HTML's "data structure" is the **DOM tree** — nested elements form a hierarchy. CSS selectors target elements by tag, class, ID, and relationship (child, sibling, descendant).`,
+    example: `<ul class="list">
+  <li>Item 1</li>
+  <li>Item 2</li>
+  <li>Item 3</li>
+</ul>
+
+<style>
+.list > li {
+  border-bottom: 1px solid #232b36;
+}
+.list li + li {
+  margin-top: 8px;
+}
+</style>`,
+    starter: `<ul class="list">
+  <li>One</li>
+  <li>Two</li>
+</ul>
+<style>
+/* Style direct li children of .list with padding */
+</style>`,
+    quiz: [
+      { q: "What structure represents an HTML document's hierarchy?", options: ["The CSSOM", "The DOM (Document Object Model)", "The Virtual DOM", "The Shadow Tree only"], correct: 1 },
+      { q: "What does the `>` combinator select?", options: ["All descendants", "Direct children only", "Siblings", "The parent"], correct: 1 },
+      { q: "What does `li + li` select?", options: ["Every li", "An li immediately following another li", "The first li", "Nested li elements"], correct: 1 },
+    ],
+  },
+  'OOP Concepts': {
+    explain: `HTML/CSS isn't object-oriented, but **component thinking** (reusable classes, BEM naming, CSS custom properties as "props") mirrors OOP ideas like reusability and encapsulation.`,
+    example: `<!-- BEM naming: block__element--modifier -->
+<div class="card card--highlighted">
+  <h3 class="card__title">Title</h3>
+  <p class="card__body">Body text</p>
+</div>
+
+<style>
+.card { border: 1px solid #232b36; padding: 16px; }
+.card--highlighted { border-color: #39d98a; }
+.card__title { font-weight: 700; }
+</style>`,
+    starter: `<div class="badge badge--success">Done</div>
+<style>
+/* Style .badge as a pill, .badge--success in green */
+</style>`,
+    quiz: [
+      { q: "What does BEM stand for?", options: ["Basic Element Model", "Block Element Modifier", "Bootstrap Element Markup", "Base Emphasis Method"], correct: 1 },
+      { q: "What CSS feature acts like a reusable 'prop'?", options: ["!important", "Custom properties (variables)", "Comments", "IDs"], correct: 1 },
+      { q: "Why use classes over IDs for styling?", options: [
+          "Classes are faster to parse", "Classes are reusable across multiple elements", "IDs don't work in CSS", "There's no difference"
+        ], correct: 1 },
+    ],
+  },
+  'Error Handling': {
+    explain: `HTML/CSS is fault-tolerant by design — browsers silently ignore invalid CSS properties or unclosed tags rather than crashing. Validation tools (like the W3C validator) catch mistakes proactively since there's no runtime exception system.`,
+    example: `<style>
+.box {
+  colr: red; /* invalid property name — silently ignored, no error */
+  color: green; /* this one applies */
+}
+</style>
+<div class="box">Still renders fine</div>`,
+    starter: `<style>
+.box {
+  /* Intentionally add an invalid property, then a valid color below it */
+}
+</style>
+<div class="box">Test</div>`,
+    quiz: [
+      { q: "What happens when a browser encounters invalid CSS?", options: [
+          "The whole page fails to load", "It throws a JS-style exception", "It silently ignores that rule and continues", "It auto-corrects the typo"
+        ], correct: 2 },
+      { q: "What tool helps catch HTML/CSS mistakes before they ship?", options: ["A try/catch block", "The W3C validator", "A compiler", "console.error"], correct: 1 },
+      { q: "Does CSS have a runtime exception system like try/catch?", options: ["Yes", "No", "Only in CSS4", "Only with preprocessors"], correct: 1 },
+    ],
+  },
+},
+
+sql: {
+  'Variables & Data Types': {
+    explain: `SQL organizes data into **tables** with typed **columns**. Common types: \`INTEGER\`, \`VARCHAR(n)\`, \`TEXT\`, \`BOOLEAN\`, \`DATE\`, \`DECIMAL\`. Schema is declared with \`CREATE TABLE\`.`,
+    example: `CREATE TABLE users (
+    id INTEGER PRIMARY KEY,
+    name VARCHAR(100),
+    age INTEGER,
+    is_active BOOLEAN
+);
+
+INSERT INTO users (id, name, age, is_active)
+VALUES (1, 'Ada', 36, true);
+
+SELECT * FROM users;`,
+    starter: `CREATE TABLE cities (
+    id INTEGER PRIMARY KEY,
+    name VARCHAR(100),
+    population INTEGER
+);
+
+-- Insert one row for your city, then select all rows
+`,
+    quiz: [
+      { q: "What statement defines a new table's structure?", options: ["MAKE TABLE", "CREATE TABLE", "NEW TABLE", "DEFINE TABLE"], correct: 1 },
+      { q: "Which type stores variable-length text with a max size?", options: ["TEXT", "VARCHAR(n)", "STRING", "CHAR"], correct: 1 },
+      { q: "What clause adds new rows to a table?", options: ["ADD INTO", "INSERT INTO", "APPEND TO", "PUT INTO"], correct: 1 },
+    ],
+  },
+  'Control Flow': {
+    explain: `SQL's "control flow" is mostly declarative: \`WHERE\` filters rows, \`CASE WHEN\` branches per-row, and \`ORDER BY\`/\`LIMIT\` control result shape. Procedural control flow (\`IF\`, loops) only appears in stored procedures.`,
+    example: `SELECT
+    name,
+    CASE
+        WHEN age >= 65 THEN 'Senior'
+        WHEN age >= 18 THEN 'Adult'
+        ELSE 'Minor'
+    END AS age_group
+FROM users
+WHERE is_active = true
+ORDER BY age DESC;`,
+    starter: `-- Select name and a CASE column labeling population
+-- as 'Large' if > 1000000 else 'Small'
+
+SELECT name FROM cities;
+`,
+    quiz: [
+      { q: "What clause filters rows before they're returned?", options: ["FILTER", "WHERE", "HAVING", "ONLY"], correct: 1 },
+      { q: "What construct branches logic per-row in a SELECT?", options: ["IF/ELSE", "CASE WHEN", "SWITCH", "COND"], correct: 1 },
+      { q: "What clause limits the number of returned rows?", options: ["TOP", "LIMIT", "MAX", "CAP"], correct: 1 },
+    ],
+  },
+  'Functions': {
+    explain: `SQL provides built-in **aggregate functions** (\`COUNT\`, \`SUM\`, \`AVG\`, \`MIN\`, \`MAX\`) and **scalar functions** (\`UPPER\`, \`LENGTH\`, \`ROUND\`). \`GROUP BY\` pairs with aggregates to summarize data per category.`,
+    example: `SELECT
+    department,
+    COUNT(*) AS employee_count,
+    AVG(salary) AS avg_salary
+FROM employees
+GROUP BY department
+HAVING COUNT(*) > 2;`,
+    starter: `-- Count how many cities have population > 500000
+
+SELECT COUNT(*) FROM cities;
+`,
+    quiz: [
+      { q: "Which function returns the number of rows?", options: ["SUM()", "COUNT()", "TOTAL()", "ROWS()"], correct: 1 },
+      { q: "What clause groups rows for aggregate functions?", options: ["GROUP BY", "PARTITION", "COLLECT BY", "BATCH BY"], correct: 0 },
+      { q: "What clause filters groups after aggregation (unlike WHERE)?", options: ["WHERE", "HAVING", "FILTER", "POST-WHERE"], correct: 1 },
+    ],
+  },
+  'Data Structures': {
+    explain: `SQL's structure is the **relational table** — rows and typed columns, connected via **foreign keys**. \`JOIN\`s combine data across tables based on matching keys.`,
+    example: `CREATE TABLE orders (
+    id INTEGER PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    total DECIMAL
+);
+
+SELECT users.name, orders.total
+FROM orders
+JOIN users ON orders.user_id = users.id;`,
+    starter: `CREATE TABLE mayors (
+    city_id INTEGER,
+    mayor_name VARCHAR(100)
+);
+
+-- Join cities and mayors on city_id
+`,
+    quiz: [
+      { q: "What links rows between two related tables?", options: ["A trigger", "A foreign key", "An index", "A view"], correct: 1 },
+      { q: "What clause combines rows from two tables?", options: ["MERGE", "JOIN", "UNION", "LINK"], correct: 1 },
+      { q: "What does a PRIMARY KEY guarantee?", options: ["Sorted order", "Unique identification of each row", "Faster inserts only", "Nothing enforced"], correct: 1 },
+    ],
+  },
+  'OOP Concepts': {
+    explain: `SQL is not object-oriented — it's set-based and declarative. However, **views** act like reusable "interfaces" over queries, and some databases (like PostgreSQL) support table inheritance, though it's rarely used in practice.`,
+    example: `CREATE VIEW active_users AS
+SELECT id, name, age
+FROM users
+WHERE is_active = true;
+
+-- Now query the view like a table
+SELECT * FROM active_users;`,
+    starter: `-- Create a view called big_cities showing only
+-- cities with population > 1000000
+
+`,
+    quiz: [
+      { q: "What SQL feature acts like a reusable, named query?", options: ["A trigger", "A view", "A procedure only", "An index"], correct: 1 },
+      { q: "Is SQL generally considered object-oriented?", options: ["Yes, fully", "No, it's declarative and set-based", "Only in NoSQL", "Only PostgreSQL is OOP"], correct: 1 },
+      { q: "What keyword creates a view?", options: ["MAKE VIEW", "CREATE VIEW", "NEW VIEW", "DEFINE VIEW"], correct: 1 },
+    ],
+  },
+  'Error Handling': {
+    explain: `Plain SQL queries don't have try/catch — constraint violations (like a duplicate primary key) simply reject the statement with an error. Procedural SQL extensions (PL/pgSQL, T-SQL) add \`BEGIN...EXCEPTION\` or \`TRY...CATCH\` blocks.`,
+    example: `-- Standard SQL: a constraint violation just fails the statement
+INSERT INTO users (id, name) VALUES (1, 'Duplicate'); 
+-- Error: duplicate key value violates unique constraint
+
+-- In PL/pgSQL (PostgreSQL procedural extension):
+-- BEGIN
+--   INSERT INTO users (id, name) VALUES (1, 'Ada');
+-- EXCEPTION WHEN unique_violation THEN
+--   RAISE NOTICE 'User already exists';
+-- END;`,
+    starter: `-- Try inserting a row with a duplicate primary key
+-- and observe how the constraint stops it
+
+CREATE TABLE t (id INTEGER PRIMARY KEY);
+INSERT INTO t VALUES (1);
+INSERT INTO t VALUES (1);
+`,
+    quiz: [
+      { q: "What happens by default when a UNIQUE constraint is violated?", options: [
+          "The row is silently skipped", "The statement fails with an error", "The old row is overwritten", "A warning only"
+        ], correct: 1 },
+      { q: "Which SQL dialects add try/catch-style error handling?", options: [
+          "Standard ANSI SQL always", "Procedural extensions like PL/pgSQL or T-SQL", "Only SQLite", "None do"
+        ], correct: 1 },
+      { q: "What kind of constraint prevents duplicate values in a column?", options: ["CHECK", "UNIQUE", "DEFAULT", "INDEX only"], correct: 1 },
+    ],
+  },
+},
+
+};
+
+/* ---------- Comparison snippets ---------- */
+const COMPARE_TASKS = ['Print Hello World', 'Loop Through an Array', 'Define a Function', 'Conditional Branching', 'Read a Dictionary/Map'];
+
+const COMPARE_SNIPPETS = {
+  'Print Hello World': {
+    python: `print("Hello, World!")`,
+    javascript: `console.log("Hello, World!");`,
+    java: `System.out.println("Hello, World!");`,
+    cpp: `#include <iostream>
+std::cout << "Hello, World!" << std::endl;`,
+    go: `fmt.Println("Hello, World!")`,
+    rust: `println!("Hello, World!");`,
+    htmlcss: `<p>Hello, World!</p>`,
+    sql: `SELECT 'Hello, World!';`,
+  },
+  'Loop Through an Array': {
+    python: `nums = [1, 2, 3]
+for n in nums:
+    print(n)`,
+    javascript: `const nums = [1, 2, 3];
+for (const n of nums) {
+  console.log(n);
+}`,
+    java: `int[] nums = {1, 2, 3};
+for (int n : nums) {
+    System.out.println(n);
+}`,
+    cpp: `std::vector<int> nums = {1, 2, 3};
+for (int n : nums) {
+    std::cout << n << std::endl;
+}`,
+    go: `nums := []int{1, 2, 3}
+for _, n := range nums {
+    fmt.Println(n)
+}`,
+    rust: `let nums = vec![1, 2, 3];
+for n in &nums {
+    println!("{}", n);
+}`,
+    htmlcss: `<ul>
+  <li>1</li><li>2</li><li>3</li>
+</ul>`,
+    sql: `SELECT * FROM nums;`,
+  },
+  'Define a Function': {
+    python: `def square(x):
+    return x * x`,
+    javascript: `function square(x) {
+  return x * x;
+}`,
+    java: `static int square(int x) {
+    return x * x;
+}`,
+    cpp: `int square(int x) {
+    return x * x;
+}`,
+    go: `func square(x int) int {
+    return x * x
+}`,
+    rust: `fn square(x: i32) -> i32 {
+    x * x
+}`,
+    htmlcss: `/* Not applicable — CSS uses functions like calc() */
+calc(2 * 2)`,
+    sql: `CREATE FUNCTION square(x INT)
+RETURNS INT AS $$
+  SELECT x * x;
+$$ LANGUAGE SQL;`,
+  },
+  'Conditional Branching': {
+    python: `if score >= 90:
+    grade = "A"
+else:
+    grade = "B"`,
+    javascript: `if (score >= 90) {
+  grade = "A";
+} else {
+  grade = "B";
+}`,
+    java: `if (score >= 90) {
+    grade = "A";
+} else {
+    grade = "B";
+}`,
+    cpp: `if (score >= 90) {
+    grade = "A";
+} else {
+    grade = "B";
+}`,
+    go: `if score >= 90 {
+    grade = "A"
+} else {
+    grade = "B"
+}`,
+    rust: `let grade = if score >= 90 { "A" } else { "B" };`,
+    htmlcss: `.grade { color: gray; }
+.grade--high { color: green; }`,
+    sql: `SELECT CASE WHEN score >= 90 THEN 'A' ELSE 'B' END
+FROM results;`,
+  },
+  'Read a Dictionary/Map': {
+    python: `person = {"name": "Ada"}
+print(person["name"])`,
+    javascript: `const person = { name: "Ada" };
+console.log(person.name);`,
+    java: `Map<String, String> person = new HashMap<>();
+person.put("name", "Ada");
+System.out.println(person.get("name"));`,
+    cpp: `std::map<std::string, std::string> person;
+person["name"] = "Ada";
+std::cout << person["name"];`,
+    go: `person := map[string]string{"name": "Ada"}
+fmt.Println(person["name"])`,
+    rust: `let mut person = HashMap::new();
+person.insert("name", "Ada");
+println!("{}", person["name"]);`,
+    htmlcss: `<!-- N/A: use data attributes -->
+<div data-name="Ada"></div>`,
+    sql: `SELECT name FROM people WHERE id = 1;`,
+  },
+};
+
+/* ---------- Cheat sheet data ---------- */
+const CHEAT_ROWS = [
+  { concept: 'Print to console', python: 'print(x)', javascript: 'console.log(x)', java: 'System.out.println(x);', cpp: 'std::cout << x;', go: 'fmt.Println(x)', rust: 'println!("{}", x);', sql: 'SELECT x;' },
+  { concept: 'Variable declaration', python: 'x = 5', javascript: 'let x = 5;', java: 'int x = 5;', cpp: 'int x = 5;', go: 'x := 5', rust: 'let x = 5;', sql: 'DECLARE x INT;' },
+  { concept: 'String concatenation', python: 'a + b', javascript: '`${a}${b}`', java: 'a + b', cpp: 'a + b', go: 'a + b', rust: 'format!("{}{}", a, b)', sql: "a || b" },
+  { concept: 'If statement', python: 'if x > 0:', javascript: 'if (x > 0) {', java: 'if (x > 0) {', cpp: 'if (x > 0) {', go: 'if x > 0 {', rust: 'if x > 0 {', sql: 'CASE WHEN x > 0' },
+  { concept: 'For loop (range)', python: 'for i in range(5):', javascript: 'for (let i=0;i<5;i++){', java: 'for (int i=0;i<5;i++){', cpp: 'for (int i=0;i<5;i++){', go: 'for i:=0;i<5;i++{', rust: 'for i in 0..5 {', sql: 'N/A (set-based)' },
+  { concept: 'Function definition', python: 'def f(x):', javascript: 'function f(x) {', java: 'int f(int x) {', cpp: 'int f(int x) {', go: 'func f(x int) int {', rust: 'fn f(x: i32) -> i32 {', sql: 'CREATE FUNCTION f(x INT)' },
+  { concept: 'Array/list literal', python: '[1, 2, 3]', javascript: '[1, 2, 3]', java: 'new int[]{1,2,3}', cpp: '{1, 2, 3}', go: '[]int{1, 2, 3}', rust: 'vec![1, 2, 3]', sql: 'N/A' },
+  { concept: 'Dict/map literal', python: '{"a": 1}', javascript: '{ a: 1 }', java: 'Map.of("a", 1)', cpp: '{{"a", 1}}', go: 'map[string]int{"a": 1}', rust: 'HashMap::from([("a",1)])', sql: 'N/A' },
+  { concept: 'Null/nothing value', python: 'None', javascript: 'null / undefined', java: 'null', cpp: 'nullptr', go: 'nil', rust: 'None (Option<T>)', sql: 'NULL' },
+  { concept: 'Comment', python: '# comment', javascript: '// comment', java: '// comment', cpp: '// comment', go: '// comment', rust: '// comment', sql: '-- comment' },
+  { concept: 'Equality check', python: 'a == b', javascript: 'a === b', java: 'a.equals(b)', cpp: 'a == b', go: 'a == b', rust: 'a == b', sql: 'a = b' },
+  { concept: 'Class/type definition', python: 'class Foo:', javascript: 'class Foo {', java: 'class Foo {', cpp: 'class Foo {', go: 'type Foo struct {', rust: 'struct Foo {', sql: 'CREATE TABLE foo (' },
+];
+
+/* =========================================================================
+   LOCAL STORAGE / PROGRESS
+   ========================================================================= */
+
+const STORAGE_KEY = 'codequest_progress_v1';
+
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveProgress(data) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) { /* ignore quota errors */ }
+}
+
+function useProgress() {
+  const [progress, setProgress] = useState(loadProgress);
+
+  const markComplete = useCallback((langId, moduleName, done) => {
+    setProgress(prev => {
+      const next = { ...prev };
+      next[langId] = { ...(next[langId] || {}) };
+      next[langId][moduleName] = done;
+      saveProgress(next);
+      return next;
+    });
+  }, []);
+
+  const isDone = useCallback((langId, moduleName) => {
+    return !!(progress[langId] && progress[langId][moduleName]);
+  }, [progress]);
+
+  const langPct = useCallback((langId) => {
+    const done = MODULE_TEMPLATE.filter(m => isDone(langId, m)).length;
+    return Math.round((done / MODULE_TEMPLATE.length) * 100);
+  }, [isDone]);
+
+  const totalPct = useMemo(() => {
+    const totalModules = LANGUAGES.length * MODULE_TEMPLATE.length;
+    let done = 0;
+    LANGUAGES.forEach(l => MODULE_TEMPLATE.forEach(m => { if (isDone(l.id, m)) done++; }));
+    return Math.round((done / totalModules) * 100);
+  }, [isDone]);
+
+  return { progress, markComplete, isDone, langPct, totalPct };
+}
+
+/* =========================================================================
+   CODE EXECUTION ENGINES
+   ========================================================================= */
+
+// JS: run in a sandboxed iframe-free way by overriding console within a Function scope
+function runJavaScript(code) {
+  const logs = [];
+  const fakeConsole = {
+    log: (...args) => logs.push({ type: 'log', text: args.map(stringifyArg).join(' ') }),
+    error: (...args) => logs.push({ type: 'err', text: args.map(stringifyArg).join(' ') }),
+    warn: (...args) => logs.push({ type: 'log', text: args.map(stringifyArg).join(' ') }),
+    info: (...args) => logs.push({ type: 'log', text: args.map(stringifyArg).join(' ') }),
+  };
+  try {
+    const fn = new Function('console', code);
+    fn(fakeConsole);
+  } catch (err) {
+    logs.push({ type: 'err', text: (err && err.message) ? err.message : String(err) });
+  }
+  return logs;
+}
+
+function stringifyArg(a) {
+  if (typeof a === 'object') {
+    try { return JSON.stringify(a); } catch (e) { return String(a); }
+  }
+  return String(a);
+}
+
+// Python: lazy-load Pyodide from CDN on first use
+let pyodideInstance = null;
+let pyodideLoading = null;
+
+function loadPyodide_() {
+  if (pyodideInstance) return Promise.resolve(pyodideInstance);
+  if (pyodideLoading) return pyodideLoading;
+
+  pyodideLoading = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/pyodide/v0.26.1/full/pyodide.js';
+    script.onload = async () => {
+      try {
+        const py = await window.loadPyodide();
+        pyodideInstance = py;
+        resolve(py);
+      } catch (e) { reject(e); }
+    };
+    script.onerror = () => reject(new Error('Failed to load Python runtime'));
+    document.body.appendChild(script);
+  });
+  return pyodideLoading;
+}
+
+async function runPython(code) {
+  const logs = [];
+  try {
+    const py = await loadPyodide_();
+    py.setStdout({ batched: (s) => logs.push({ type: 'log', text: s }) });
+    py.setStderr({ batched: (s) => logs.push({ type: 'err', text: s }) });
+    await py.runPythonAsync(code);
+  } catch (err) {
+    logs.push({ type: 'err', text: (err && err.message) ? err.message : String(err) });
+  }
+  return logs;
+}
+
+// Other languages: no client-side compiler available. We show an informative
+// simulated-output note rather than pretending to execute.
+function unsupportedRuntimeNote(langName) {
+  return [
+    { type: 'info', text: `${langName} can't be compiled directly in the browser.` },
+    { type: 'info', text: `Read the code carefully and predict the output — that's the exercise!` },
+    { type: 'info', text: `For real execution, try running this locally or on an online compiler (e.g. replit.com, godbolt.org, or the Go Playground).` },
+  ];
+}
+
+const RUNNABLE_LANGS = new Set(['python', 'javascript']);
+
+/* =========================================================================
+   SMALL UI PRIMITIVES
+   ========================================================================= */
+
+function Icon({ name, size = 16 }) {
+  // minimal inline icon set via unicode/symbols to avoid extra deps
+  const map = {
+    check: '✓', arrow: '→', back: '←', menu: '☰', close: '✕',
+    play: '▶', reset: '↺', trophy: '🏆', bolt: '⚡', book: '📘',
+    compare: '⇄', sheet: '▤', sandbox: '⌘', target: '◎',
+  };
+  return <span style={{ fontSize: size, lineHeight: 1 }}>{map[name] || ''}</span>;
+}
+
+function CodeBlock({ code, lang, filename }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (ref.current && window.Prism) {
+      window.Prism.highlightElement(ref.current);
+    }
+  }, [code, lang]);
+
+  const [copied, setCopied] = useState(false);
+  const doCopy = () => {
+    navigator.clipboard?.writeText(code).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  };
+
+  const prismLang = PRISM_LANG[lang] || 'javascript';
+
+  return (
+    <div className="code-block-wrap">
+      <div className="code-block-header">
+        <div className="dots">
+          <span style={{ background: '#e8615c' }}></span>
+          <span style={{ background: '#e8b34a' }}></span>
+          <span style={{ background: '#39d98a' }}></span>
+        </div>
+        <span>{filename || `example.${prismLang === 'python' ? 'py' : prismLang === 'markup' ? 'html' : prismLang}`}</span>
+        <button className="copy-btn" onClick={doCopy}>{copied ? 'Copied!' : 'Copy'}</button>
+      </div>
+      <pre className={`language-${prismLang}`}><code ref={ref} className={`language-${prismLang}`}>{code}</code></pre>
+    </div>
+  );
+}
+
+function InteractiveEditor({ langId, initialCode }) {
+  const [code, setCode] = useState(initialCode);
+  const [output, setOutput] = useState(null);
+  const [running, setRunning] = useState(false);
+  const langInfo = LANG_MAP[langId];
+  const runnable = RUNNABLE_LANGS.has(langId);
+
+  const handleRun = async () => {
+    setRunning(true);
+    setOutput(null);
+    if (langId === 'javascript') {
+      const logs = runJavaScript(code);
+      setOutput(logs);
+      setRunning(false);
+    } else if (langId === 'python') {
+      setOutput([{ type: 'info', text: 'Starting Python runtime (first run may take a few seconds)...' }]);
+      const logs = await runPython(code);
+      setOutput(logs);
+      setRunning(false);
+    } else {
+      setOutput(unsupportedRuntimeNote(langInfo.name));
+      setRunning(false);
+    }
+  };
+
+  const handleReset = () => {
+    setCode(initialCode);
+    setOutput(null);
+  };
+
+  return (
+    <div className="editor-panel">
+      <div className="editor-toolbar">
+        <div className="et-label">
+          <Icon name="bolt" size={13} /> Interactive Editor — {langInfo.name}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <button className="run-btn" onClick={handleRun} disabled={running}>
+            <Icon name="play" size={11} /> {running ? 'Running...' : 'Run'}
+          </button>
+          <button className="reset-btn" onClick={handleReset}>Reset</button>
+        </div>
+      </div>
+      <div className="editor-split">
+        <textarea
+          className="code-input"
+          spellCheck={false}
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Tab') {
+              e.preventDefault();
+              const { selectionStart, selectionEnd } = e.target;
+              const newVal = code.slice(0, selectionStart) + '    ' + code.slice(selectionEnd);
+              setCode(newVal);
+              requestAnimationFrame(() => {
+                e.target.selectionStart = e.target.selectionEnd = selectionStart + 4;
+              });
+            }
+          }}
+        />
+        <div className="output-pane">
+          {output === null && <div className="ph">{runnable ? '// Output will appear here after you click Run' : '// This language runs conceptually — click Run for guidance'}</div>}
+          {output && output.length === 0 && <div className="ph">// (no output)</div>}
+          {output && output.map((line, i) => (
+            <div key={i} className={`output-line ${line.type}`}>{line.type === 'err' ? '✗ ' : line.type === 'info' ? 'ℹ ' : ''}{line.text}</div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Quiz({ questions, onComplete, storageKeySuffix }) {
+  const [answers, setAnswers] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+
+  const selectAnswer = (qIdx, optIdx) => {
+    if (submitted) return;
+    setAnswers(prev => ({ ...prev, [qIdx]: optIdx }));
+  };
+
+  const handleSubmit = () => {
+    setSubmitted(true);
+    const correctCount = questions.filter((q, i) => answers[i] === q.correct).length;
+    onComplete && onComplete(correctCount, questions.length);
+  };
+
+  const allAnswered = questions.every((q, i) => answers[i] !== undefined);
+  const correctCount = submitted ? questions.filter((q, i) => answers[i] === q.correct).length : 0;
+  const passed = submitted && correctCount === questions.length;
+
+  return (
+    <div className="quiz-box">
+      <h3><Icon name="target" size={16} /> Knowledge Check</h3>
+      <div className="quiz-sub">Answer all {questions.length} questions to mark this module complete.</div>
+      {questions.map((q, qi) => (
+        <div className="quiz-q" key={qi}>
+          <div className="qtext">{qi + 1}. {q.q}</div>
+          <div className="quiz-options">
+            {q.options.map((opt, oi) => {
+              let cls = 'quiz-option';
+              if (submitted) {
+                if (oi === q.correct) cls += ' correct';
+                else if (answers[qi] === oi) cls += ' incorrect';
+              } else if (answers[qi] === oi) {
+                cls += ' selected';
+              }
+              return (
+                <button key={oi} className={cls} disabled={submitted} onClick={() => selectAnswer(qi, oi)}>
+                  {opt}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+      {!submitted && (
+        <button className="run-btn" style={{ opacity: allAnswered ? 1 : 0.5 }} disabled={!allAnswered} onClick={handleSubmit}>
+          Submit Answers
+        </button>
+      )}
+      {submitted && (
+        <div className={`quiz-result-banner ${passed ? 'pass' : 'fail'}`}>
+          <span>{passed ? `Perfect score — ${correctCount}/${questions.length}!` : `You scored ${correctCount}/${questions.length}. Review the highlighted answers above.`}</span>
+          {!passed && <button className="reset-btn" onClick={() => { setSubmitted(false); setAnswers({}); }}>Try Again</button>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* =========================================================================
+   PAGES
+   ========================================================================= */
+
+function HomePage({ navigate, progressApi }) {
+  return (
+    <div>
+      <div className="hero">
+        <div className="hero-eyebrow"><Icon name="bolt" size={12} /> 8 languages · 48 modules · zero setup</div>
+        <h1>Learn to code<br /><span className="accent-text">across every language</span></h1>
+        <p className="sub">
+          CodeQuest teaches programming fundamentals through parallel tracks — see how the same concept
+          looks in Python, JavaScript, Java, C++, Go, Rust, HTML/CSS, and SQL, then practice in a live
+          in-browser editor.
+        </p>
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button className="run-btn" style={{ padding: '12px 24px', fontSize: 14 }} onClick={() => navigate({ page: 'track', lang: 'python' })}>
+            Start with Python <Icon name="arrow" size={12} />
+          </button>
+          <button className="reset-btn" style={{ padding: '12px 24px', fontSize: 14 }} onClick={() => navigate({ page: 'compare' })}>
+            Compare Languages
+          </button>
+        </div>
+        <div className="hero-stats">
+          <div className="hero-stat"><div className="num">{progressApi.totalPct}%</div><div className="label">Overall Progress</div></div>
+          <div className="hero-stat"><div className="num">{LANGUAGES.length}</div><div className="label">Languages</div></div>
+          <div className="hero-stat"><div className="num">{LANGUAGES.length * MODULE_TEMPLATE.length}</div><div className="label">Total Modules</div></div>
+        </div>
+      </div>
+
+      <div className="container">
+        <div className="feature-row">
+          <div className="feature-tile" onClick={() => navigate({ page: 'compare' })}>
+            <div className="ft-icon"><Icon name="compare" size={20} /></div>
+            <h4>Compare Languages</h4>
+            <p>Pick any two languages and see identical tasks solved side-by-side.</p>
+          </div>
+          <div className="feature-tile" onClick={() => navigate({ page: 'cheatsheet' })}>
+            <div className="ft-icon"><Icon name="sheet" size={20} /></div>
+            <h4>Cheat Sheet</h4>
+            <p>Every core syntax pattern across all 8 languages in one scannable table.</p>
+          </div>
+          <div className="feature-tile" onClick={() => navigate({ page: 'sandbox' })}>
+            <div className="ft-icon"><Icon name="sandbox" size={20} /></div>
+            <h4>Sandbox</h4>
+            <p>A free-form playground to write and run Python or JavaScript instantly.</p>
+          </div>
+        </div>
+
+        <div className="section-heading">
+          <h2>Choose your language</h2>
+          <span className="section-tag">// each track has 6 modules</span>
+        </div>
+        <div className="lang-grid">
+          {LANGUAGES.map(lang => (
+            <div key={lang.id} className="lang-card" style={{ '--lang-color': lang.color }} onClick={() => navigate({ page: 'track', lang: lang.id })}>
+              <div className="lang-card-top">
+                <div className="lang-icon">{lang.icon}</div>
+                <span className={`diff-badge diff-${lang.difficulty}`}>{lang.difficulty}</span>
+              </div>
+              <h3>{lang.name}</h3>
+              <p>{lang.desc}</p>
+              <div className="lang-card-footer">
+                <div className="lang-progress-track">
+                  <div className="lang-progress-fill" style={{ width: `${progressApi.langPct(lang.id)}%` }}></div>
+                </div>
+                <span className="lang-progress-pct">{progressApi.langPct(lang.id)}%</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <footer className="site-footer">
+        CodeQuest — built for learning, not for production. Progress is saved locally in your browser.
+      </footer>
+    </div>
+  );
+}
+
+function TrackPage({ langId, moduleName, navigate, progressApi, sidebarOpen, setSidebarOpen }) {
+  const lang = LANG_MAP[langId];
+  if (!lang) return <div className="empty-note">Unknown language.</div>;
+
+  const currentModule = moduleName || MODULE_TEMPLATE[0];
+  const moduleData = CONTENT[langId] && CONTENT[langId][currentModule];
+  const moduleIndex = MODULE_TEMPLATE.indexOf(currentModule);
+  const prevModule = moduleIndex > 0 ? MODULE_TEMPLATE[moduleIndex - 1] : null;
+  const nextModule = moduleIndex < MODULE_TEMPLATE.length - 1 ? MODULE_TEMPLATE[moduleIndex + 1] : null;
+
+  const done = progressApi.isDone(langId, currentModule);
+
+  const [quizPassed, setQuizPassed] = useState(done);
+  useEffect(() => { setQuizPassed(done); }, [langId, currentModule, done]);
+
+  const handleQuizComplete = (correct, total) => {
+    if (correct === total) {
+      setQuizPassed(true);
+    }
+  };
+
+  return (
+    <div className="track-layout">
+      {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>}
+      <div className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
+        <div className="sidebar-header">
+          <a className="back-link" onClick={() => navigate({ page: 'home' })}><Icon name="back" size={11} /> All languages</a>
+          <div className="sidebar-lang-title">
+            <div className="lang-icon" style={{ '--lang-color': lang.color, width: 34, height: 34, fontSize: 14 }}>{lang.icon}</div>
+            <h3>{lang.name}</h3>
+          </div>
+          <div className="sidebar-progress-label">{progressApi.langPct(langId)}% complete</div>
+          <div className="lang-progress-track" style={{ marginTop: 8 }}>
+            <div className="lang-progress-fill" style={{ width: `${progressApi.langPct(langId)}%`, '--lang-color': lang.color, background: lang.color }}></div>
+          </div>
+        </div>
+        <ul className="module-list">
+          {MODULE_TEMPLATE.map((m, i) => {
+            const isActive = m === currentModule;
+            const isDone = progressApi.isDone(langId, m);
+            return (
+              <li key={m} className={`module-item ${isActive ? 'active' : ''}`} onClick={() => { navigate({ page: 'track', lang: langId, module: m }); setSidebarOpen(false); }}>
+                <span className={`module-check ${isDone ? 'done' : ''}`}>{isDone ? <Icon name="check" size={10} /> : ''}</span>
+                <span className="module-num">{String(i + 1).padStart(2, '0')}</span>
+                <span>{m}</span>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
+      <button className="mobile-sidebar-toggle" onClick={() => setSidebarOpen(true)}><Icon name="menu" size={18} /></button>
+
+      <div className="track-main track-main-narrow">
+        {!moduleData ? (
+          <div className="empty-note">Module content coming soon.</div>
+        ) : (
+          <>
+            <div className="module-header">
+              <div className="crumb">{lang.name} / Module {moduleIndex + 1} of {MODULE_TEMPLATE.length}</div>
+              <h1>{currentModule}</h1>
+              <div className="lede">
+                <MarkdownLite text={moduleData.explain} />
+              </div>
+            </div>
+
+            <div className="section-heading" style={{ marginTop: 30 }}>
+              <h2 style={{ fontSize: 17 }}>Example</h2>
+            </div>
+            <CodeBlock code={moduleData.example} lang={langId} />
+
+            <div className="section-heading" style={{ marginTop: 6 }}>
+              <h2 style={{ fontSize: 17 }}>Try it yourself</h2>
+            </div>
+            <InteractiveEditor key={langId + currentModule} langId={langId} initialCode={moduleData.starter} />
+
+            <Quiz key={'quiz-' + langId + currentModule} questions={moduleData.quiz} onComplete={handleQuizComplete} />
+
+            <div className="module-nav-footer">
+              {prevModule ? (
+                <button className="nav-footer-btn" onClick={() => navigate({ page: 'track', lang: langId, module: prevModule })}>
+                  <Icon name="back" size={14} />
+                  <span><span className="nf-label">Previous</span>{prevModule}</span>
+                </button>
+              ) : <div></div>}
+
+              <button
+                className={`mark-complete-btn ${done ? 'done' : ''}`}
+                disabled={!quizPassed}
+                style={{ opacity: quizPassed ? 1 : 0.5 }}
+                onClick={() => progressApi.markComplete(langId, currentModule, !done)}
+              >
+                {done ? <><Icon name="check" size={12} /> Completed</> : quizPassed ? 'Mark as Complete' : 'Pass quiz to unlock'}
+              </button>
+
+              {nextModule ? (
+                <button className="nav-footer-btn" style={{ textAlign: 'right', marginLeft: 'auto' }} onClick={() => navigate({ page: 'track', lang: langId, module: nextModule })}>
+                  <span><span className="nf-label">Next</span>{nextModule}</span>
+                  <Icon name="arrow" size={14} />
+                </button>
+              ) : <div></div>}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Very small markdown-ish renderer: supports **bold**, `code`, and bullet lists (- item), paragraphs
+function MarkdownLite({ text }) {
+  const blocks = text.trim().split(/\n\n+/);
+  return (
+    <div className="prose">
+      {blocks.map((block, bi) => {
+        const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+        const isList = lines.every(l => l.startsWith('- '));
+        if (isList) {
+          return (
+            <ul key={bi}>
+              {lines.map((l, li) => <li key={li}>{renderInline(l.slice(2))}</li>)}
+            </ul>
+          );
+        }
+        return <p key={bi}>{renderInline(block)}</p>;
+      })}
+    </div>
+  );
+}
+
+function renderInline(str) {
+  // split on **bold** and `code`
+  const parts = [];
+  let remaining = str;
+  const regex = /(\*\*[^*]+\*\*|`[^`]+`)/g;
+  let lastIndex = 0;
+  let match;
+  let key = 0;
+  while ((match = regex.exec(str)) !== null) {
+    if (match.index > lastIndex) parts.push(str.slice(lastIndex, match.index));
+    const token = match[0];
+    if (token.startsWith('**')) {
+      parts.push(<strong key={key++}>{token.slice(2, -2)}</strong>);
+    } else {
+      parts.push(<code className="inline" key={key++}>{token.slice(1, -1)}</code>);
+    }
+    lastIndex = match.index + token.length;
+  }
+  if (lastIndex < str.length) parts.push(str.slice(lastIndex));
+  return parts;
+}
+
+function ComparePage() {
+  const [langA, setLangA] = useState('python');
+  const [langB, setLangB] = useState('javascript');
+  const [task, setTask] = useState(COMPARE_TASKS[0]);
+
+  const snippetA = COMPARE_SNIPPETS[task]?.[langA] || '// Not available';
+  const snippetB = COMPARE_SNIPPETS[task]?.[langB] || '// Not available';
+
+  return (
+    <div className="container" style={{ paddingTop: 36, paddingBottom: 70 }}>
+      <div className="section-heading" style={{ marginTop: 10 }}>
+        <h2>Compare Languages</h2>
+        <span className="section-tag">// same task, different syntax</span>
+      </div>
+
+      <div className="compare-controls">
+        <div className="compare-select-wrap">
+          <label>Language A</label>
+          <select className="lang-select" value={langA} onChange={e => setLangA(e.target.value)}>
+            {LANGUAGES.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+          </select>
+        </div>
+        <div className="compare-vs">vs</div>
+        <div className="compare-select-wrap">
+          <label>Language B</label>
+          <select className="lang-select" value={langB} onChange={e => setLangB(e.target.value)}>
+            {LANGUAGES.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+          </select>
+        </div>
+      </div>
+
+      <div className="task-tabs">
+        {COMPARE_TASKS.map(t => (
+          <button key={t} className={`task-tab ${t === task ? 'active' : ''}`} onClick={() => setTask(t)}>{t}</button>
+        ))}
+      </div>
+
+      <div className="compare-grid">
+        <div className="compare-col">
+          <div className="compare-col-head">
+            <div className="lang-icon" style={{ '--lang-color': LANG_MAP[langA].color, width: 30, height: 30, fontSize: 12 }}>{LANG_MAP[langA].icon}</div>
+            {LANG_MAP[langA].name}
+          </div>
+          <CodeBlockBare code={snippetA} lang={langA} />
+        </div>
+        <div className="compare-col">
+          <div className="compare-col-head">
+            <div className="lang-icon" style={{ '--lang-color': LANG_MAP[langB].color, width: 30, height: 30, fontSize: 12 }}>{LANG_MAP[langB].icon}</div>
+            {LANG_MAP[langB].name}
+          </div>
+          <CodeBlockBare code={snippetB} lang={langB} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Code block without the header bar, used inside comparison columns which already have a head
+function CodeBlockBare({ code, lang }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (ref.current && window.Prism) window.Prism.highlightElement(ref.current);
+  }, [code, lang]);
+  const prismLang = PRISM_LANG[lang] || 'javascript';
+  return (
+    <pre className={`language-${prismLang}`} style={{ margin: 0, borderRadius: 0, fontSize: 13 }}>
+      <code ref={ref} className={`language-${prismLang}`}>{code}</code>
+    </pre>
+  );
+}
+
+function CheatSheetPage() {
+  const [filter, setFilter] = useState('');
+  const rows = CHEAT_ROWS.filter(r => r.concept.toLowerCase().includes(filter.toLowerCase()));
+
+  return (
+    <div className="container" style={{ paddingTop: 36, paddingBottom: 70 }}>
+      <div className="section-heading" style={{ marginTop: 10 }}>
+        <h2>Cheat Sheet</h2>
+        <span className="section-tag">// {CHEAT_ROWS.length} core patterns</span>
+      </div>
+      <p style={{ color: 'var(--text-dim)', fontSize: 14, marginBottom: 20, maxWidth: 640 }}>
+        A quick-reference table of core syntax across all supported languages. Search to filter by concept.
+      </p>
+      <input
+        type="text"
+        placeholder="Filter concepts (e.g. 'loop', 'function')..."
+        value={filter}
+        onChange={e => setFilter(e.target.value)}
+        style={{
+          background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8,
+          padding: '10px 14px', color: 'var(--text)', fontSize: 13.5, marginBottom: 24, width: '100%', maxWidth: 360,
+        }}
+      />
+      <div className="cheat-table-wrap">
+        <table className="cheat-table">
+          <thead>
+            <tr>
+              <th>Concept</th>
+              <th>Python</th>
+              <th>JavaScript</th>
+              <th>Java</th>
+              <th>C++</th>
+              <th>Go</th>
+              <th>Rust</th>
+              <th>SQL</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r, i) => (
+              <tr key={i}>
+                <td>{r.concept}</td>
+                <td>{r.python}</td>
+                <td>{r.javascript}</td>
+                <td>{r.java}</td>
+                <td>{r.cpp}</td>
+                <td>{r.go}</td>
+                <td>{r.rust}</td>
+                <td>{r.sql}</td>
+              </tr>
+            ))}
+            {rows.length === 0 && (
+              <tr><td colSpan={8} style={{ textAlign: 'center', color: 'var(--text-faint)', fontFamily: 'var(--sans)' }}>No matching concepts.</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function SandboxPage() {
+  const [langId, setLangId] = useState('javascript');
+  const defaultCode = {
+    python: `# Python sandbox — write anything!
+def fib(n):
+    a, b = 0, 1
+    for _ in range(n):
+        a, b = b, a + b
+    return a
+
+for i in range(10):
+    print(fib(i))
+`,
+    javascript: `// JavaScript sandbox — write anything!
+function fib(n) {
+  let a = 0, b = 1;
+  for (let i = 0; i < n; i++) {
+    [a, b] = [b, a + b];
+  }
+  return a;
+}
+
+for (let i = 0; i < 10; i++) {
+  console.log(fib(i));
+}
+`,
+  };
+
+  const [code, setCode] = useState(defaultCode.javascript);
+  const [output, setOutput] = useState(null);
+  const [running, setRunning] = useState(false);
+
+  const switchLang = (id) => {
+    setLangId(id);
+    setCode(defaultCode[id] || '// Sandbox execution only supports Python and JavaScript.\n');
+    setOutput(null);
+  };
+
+  const handleRun = async () => {
+    setRunning(true);
+    setOutput(null);
+    if (langId === 'javascript') {
+      setOutput(runJavaScript(code));
+      setRunning(false);
+    } else if (langId === 'python') {
+      setOutput([{ type: 'info', text: 'Starting Python runtime...' }]);
+      const logs = await runPython(code);
+      setOutput(logs);
+      setRunning(false);
+    }
+  };
+
+  return (
+    <div className="container" style={{ paddingTop: 36, paddingBottom: 70 }}>
+      <div className="section-heading" style={{ marginTop: 10 }}>
+        <h2>Sandbox</h2>
+        <span className="section-tag">// free-form playground</span>
+      </div>
+      <p style={{ color: 'var(--text-dim)', fontSize: 14, marginBottom: 20, maxWidth: 640 }}>
+        Write and run real Python or JavaScript instantly — no setup, no account. Great for testing ideas
+        outside of a specific module.
+      </p>
+
+      <div className="sandbox-lang-picker">
+        {['javascript', 'python'].map(id => (
+          <button
+            key={id}
+            className={`sandbox-lang-btn ${langId === id ? 'active' : ''}`}
+            style={{ '--lang-color': LANG_MAP[id].color }}
+            onClick={() => switchLang(id)}
+          >
+            {LANG_MAP[id].name}
+          </button>
+        ))}
+      </div>
+
+      <div className="editor-panel">
+        <div className="editor-toolbar">
+          <div className="et-label"><Icon name="sandbox" size={13} /> {LANG_MAP[langId].name} Playground</div>
+          <div style={{ display: 'flex' }}>
+            <button className="run-btn" onClick={handleRun} disabled={running}>
+              <Icon name="play" size={11} /> {running ? 'Running...' : 'Run'}
+            </button>
+            <button className="reset-btn" onClick={() => { setCode(defaultCode[langId]); setOutput(null); }}>Reset</button>
+          </div>
+        </div>
+        <div className="editor-split">
+          <textarea
+            className="code-input"
+            style={{ minHeight: 360 }}
+            spellCheck={false}
+            value={code}
+            onChange={e => setCode(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Tab') {
+                e.preventDefault();
+                const { selectionStart, selectionEnd } = e.target;
+                const newVal = code.slice(0, selectionStart) + '    ' + code.slice(selectionEnd);
+                setCode(newVal);
+                requestAnimationFrame(() => { e.target.selectionStart = e.target.selectionEnd = selectionStart + 4; });
+              }
+            }}
+          />
+          <div className="output-pane" style={{ minHeight: 360 }}>
+            {output === null && <div className="ph">// Output will appear here after you click Run</div>}
+            {output && output.length === 0 && <div className="ph">// (no output)</div>}
+            {output && output.map((line, i) => (
+              <div key={i} className={`output-line ${line.type}`}>{line.type === 'err' ? '✗ ' : line.type === 'info' ? 'ℹ ' : ''}{line.text}</div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================================
+   APP SHELL / ROUTER (simple state-based router, no history API dependency)
+   ========================================================================= */
+
+function parseHash() {
+  const hash = window.location.hash.replace(/^#\/?/, '');
+  const parts = hash.split('/').filter(Boolean);
+  if (parts.length === 0) return { page: 'home' };
+  if (parts[0] === 'track') return { page: 'track', lang: parts[1] || 'python', module: parts[2] ? decodeURIComponent(parts[2]) : undefined };
+  if (parts[0] === 'compare') return { page: 'compare' };
+  if (parts[0] === 'cheatsheet') return { page: 'cheatsheet' };
+  if (parts[0] === 'sandbox') return { page: 'sandbox' };
+  return { page: 'home' };
+}
+
+function routeToHash(route) {
+  if (route.page === 'home') return '#/';
+  if (route.page === 'track') return `#/track/${route.lang}${route.module ? '/' + encodeURIComponent(route.module) : ''}`;
+  if (route.page === 'compare') return '#/compare';
+  if (route.page === 'cheatsheet') return '#/cheatsheet';
+  if (route.page === 'sandbox') return '#/sandbox';
+  return '#/';
+}
+
+function App() {
+  const [route, setRoute] = useState(parseHash());
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const progressApi = useProgress();
+
+  useEffect(() => {
+    const onHashChange = () => setRoute(parseHash());
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+
+  const navigate = useCallback((newRoute) => {
+    window.location.hash = routeToHash(newRoute);
+    setRoute(newRoute);
+    setSidebarOpen(false);
+    window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+  }, []);
+
+  const navItems = [
+    { key: 'home', label: 'Home', route: { page: 'home' } },
+    { key: 'compare', label: 'Compare', route: { page: 'compare' } },
+    { key: 'cheatsheet', label: 'Cheat Sheet', route: { page: 'cheatsheet' } },
+    { key: 'sandbox', label: 'Sandbox', route: { page: 'sandbox' } },
+  ];
+
+  return (
+    <div className="app-shell">
+      <div className="topbar">
+        <div className="brand" onClick={() => navigate({ page: 'home' })} style={{ cursor: 'pointer' }}>
+          <span className="dot"></span>
+          <span><span className="bracket">{'<'}</span>CodeQuest<span className="bracket">{'/>'}</span></span>
+        </div>
+        <div className="nav-links">
+          {navItems.map(item => (
+            <button
+              key={item.key}
+              className={`navlink ${route.page === item.route.page ? 'active' : ''}`}
+              onClick={() => navigate(item.route)}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+        <button className="mobile-menu-btn" onClick={() => setSidebarOpen(o => !o)}><Icon name="menu" size={16} /></button>
+      </div>
+
+      {route.page !== 'track' && sidebarOpen && (
+        <div className="nav-links" style={{ display: 'flex', flexDirection: 'column', padding: '10px 16px', borderBottom: '1px solid var(--border-soft)' }}>
+          {navItems.map(item => (
+            <button key={item.key} className="navlink" style={{ textAlign: 'left' }} onClick={() => { navigate(item.route); setSidebarOpen(false); }}>
+              {item.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <main className="content">
+        {route.page === 'home' && <HomePage navigate={navigate} progressApi={progressApi} />}
+        {route.page === 'track' && (
+          <TrackPage
+            langId={route.lang}
+            moduleName={route.module}
+            navigate={navigate}
+            progressApi={progressApi}
+            sidebarOpen={sidebarOpen}
+            setSidebarOpen={setSidebarOpen}
+          />
+        )}
+        {route.page === 'compare' && <ComparePage />}
+        {route.page === 'cheatsheet' && <CheatSheetPage />}
+        {route.page === 'sandbox' && <SandboxPage />}
+      </main>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+
+</script>
+</body>
+</html>
